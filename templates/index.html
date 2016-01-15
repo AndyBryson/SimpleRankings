@@ -1,81 +1,67 @@
 <!DOCTYPE html>
-<style>
-table {
-    border-collapse: collapse;
-}
 
-th, td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
+<div id="wrapper">
+    {% block content %}
+        {% include 'header.html' %}
+    {% endblock %}
 
-tr:hover{background-color:#f5f5f5}
-</style>
-<title>{{league_title}}</title>
-<h1>{{league_title}}</h1>
 
-<div id="ranking_table">
-    <table>
-        <thead>
-            <th style="width: 1em;"></th>
-            <th style="min-width: 8em;">Player</th>
-            <th>Played</th>
-            <th>Won</th>
-            <th>Lost</th>
-            <th>%</th>
-            <th>Rating</th>
-        </thead>
+    <div id="ranking_table">
+        <table>
+            <thead>
+                <th style="width: 1em;"></th>
+                <th style="min-width: 8em;">Player</th>
+                <th>Played</th>
+                <th>Won</th>
+                <th>Lost</th>
+                <th>%</th>
+                <th>Rating</th>
+            </thead>
 
-        <tbody>
-        {% for player in players_by_rank %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ player.name }}</td>
-                {% set match_count = player.wins + player.losses %}
-                <td>{{ match_count }}</td>
-                <td>{{ player.wins }}</td>
-                <td>{{ player.losses }}</td>
-                {% set percent = 0 %}
-                {% if match_count %}
-                    {% set percent = ((player.wins / match_count)*100)|round|int %}
-                {% endif %}
-                <td>{{ percent }}</td>
-                <td>{{ player.rating|round|int }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-<hr />
-<div id="report_result">
-    <form action="{{ url_for('report_result') }}" method="POST">
-        <select name="winner">
-            <option value="" default selected>--select--</option>
-            {% for player in players_by_name %}
-                <option value="{{ player.player_id }}">{{ player.name }}</option>
+            <tbody>
+            {% for player in players_by_rank %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ player.name }}</td>
+                    {% set match_count = player.wins + player.losses %}
+                    <td>{{ match_count }}</td>
+                    <td>{{ player.wins }}</td>
+                    <td>{{ player.losses }}</td>
+                    {% set percent = 0 %}
+                    {% if match_count %}
+                        {% set percent = ((player.wins / match_count)*100)|round|int %}
+                    {% endif %}
+                    <td>{{ percent }}</td>
+                    <td>{{ player.rating|round|int }}</td>
+                </tr>
             {% endfor %}
-        </select>
-        defeated
-        <select name="loser">
-            <option value="" default selected>--select--</option>
-            {% for player in players_by_name %}
-                <option value={{ player.player_id }}>{{ player.name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Report Result</button>
-    </form>
-</div>
-<hr />
-<div id="add_user">
-    <form action="{{ url_for('add_user') }}" method="post">
-        <input type="text" name="name" />
-        <button type="submit">Add User</button>
-    </form>
-</div>
-<hr />
-<div id="links at bottom">
-    <p>
-        <a href="/">Table</a> | <a href="user_manager">User Management</a> | <a href="match_manager">Match Management</a>
-    </p>
+            </tbody>
+        </table>
+    </div>
+    <hr />
+    <div id="report_result">
+        <form action="{{ url_for('report_result') }}" method="POST">
+            <select name="winner">
+                <option value="" default selected>--select--</option>
+                {% for player in players_by_name %}
+                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                {% endfor %}
+            </select>
+            defeated
+            <select name="loser">
+                <option value="" default selected>--select--</option>
+                {% for player in players_by_name %}
+                    <option value={{ player.player_id }}>{{ player.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Report Result</button>
+        </form>
+    </div>
+    <hr />
+    <div id="add_user">
+        <form action="{{ url_for('add_user') }}" method="post">
+            <input type="text" name="name" />
+            <button type="submit">Add User</button>
+        </form>
+    </div>
 </div>

@@ -1,0 +1,73 @@
+    body {
+        margin:0;
+        padding:0;
+        background-color:#f2f2e9;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    }
+
+    #header {
+        margin:0;
+        padding:0;
+        background-color:white;
+    }
+
+    #header_inner {
+        padding:0px;
+        width:1024px;
+        margin: 0 auto;
+    }
+
+    #wrapper {
+        width:1024px;
+        padding:0px;
+        margin: 0 auto;
+        background-color:white;
+    }
+
+    #banner {
+        padding:0px;
+        margin:0;
+        background-color:#ffdf43;
+        position:center;
+        height:100px;
+    }
+
+    #ranking_table, #user_manager, #match_manager {
+        background-color:white;
+        padding:25px;
+    }
+
+    #ranking_table.table {
+        position:center;
+    }
+
+    #ranking_table.table.th {
+        background-color:#f2f2e9;
+    }
+
+    table {
+        border-collapse: collapse;
+        width:100%;
+    }
+
+    th {
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        color:black;
+        background-color:#ffdf43;
+    }
+
+    td {
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #ranking_table.tr:nth-child(odd){
+        color:white;
+        background-color:black;
+    }
+
+    #ranking_table.tr:nth-child(even){
+        color:black;
+        background-color:white;
+    }

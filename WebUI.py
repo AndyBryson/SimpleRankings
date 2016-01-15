@@ -15,14 +15,24 @@ __status__ = "Development"
 
 from flask import Flask, render_template, send_from_directory, request
 import os
-import threading
+import inspect
 
 from Rankings import Manager
 
 
 app = Flask(__name__
-            , static_folder=os.path.join(os.path.dirname(os.getcwd()), 'static')
+            , static_folder=os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), 'static')
             , static_url_path='')
+
+
+@app.route('/images/<path:path>')
+def send_images(path):
+    return send_from_directory(os.path.join(app.static_folder, 'images'), path)
+
+
+@app.route('/css/<path:path>')
+def send_css(path):
+    return send_from_directory(os.path.join(app.static_folder, 'css'), path)
 
 
 @app.route('/')
@@ -33,6 +43,13 @@ def index():
                            players_by_rank=ranking_manager.get_players_in_rank_order(),
                            players_by_name=ranking_manager.get_players_in_name_order())
     return html
+
+
+@app.route('/header.html')
+def show_header():
+    html = render_template('header.html', league_title=ranking_manager.league_title)
+    return html
+
 
 
 @app.route('/add_user', methods=["GET", "POST"])
@@ -91,6 +108,12 @@ def match_mod():
     if match_to_delete != "":
         ranking_manager.delete_match(int(match_to_delete))
     return match_manager()
+
+
+@app.route('/<path:path>')
+def static_proxy(path):
+    # send_static_file will guess the correct MIME type
+    return app.send_static_file(path)
 
 
 def start_flask(host, port):
