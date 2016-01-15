@@ -90,7 +90,7 @@ def user_mod():
 @app.route('/match_manager')
 def match_manager():
     html = render_template('match_manager.html',
-                           matches=ranking_manager.matches,
+                           matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
                            league_title=ranking_manager.league_title,
                            players_by_name=ranking_manager.get_players_in_name_order())

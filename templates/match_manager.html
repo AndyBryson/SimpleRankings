@@ -52,7 +52,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% set index = 0 %}
+                {% set index = matches|length - 1 %}
                 {% for match in matches %}
                 <form action="{{ url_for('match_mod') }}" method="POST">
                     <tr>
@@ -65,7 +65,7 @@
                         </td>
                     </tr>
                 </form>
-                {% set index = index + 1 %}
+                {% set index = index - 1 %}
                 {% endfor %}
             </tbody>
         </table>
