@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<style>
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover{background-color:#f5f5f5}
+</style>
+<script>
+    players = []
+    {% for player in players_by_name %}
+        players.push( { name:'{{player.name | safe}}', active:{{player.active|lower}}, player_id:{{player.player_id}} })
+    {% endfor %}
+
+    function populate_user()
+    {
+        var user_select = document.getElementById("user")
+        var id = user_select.options[user_select.selectedIndex].value;
+        if (id >= 0)
+        {
+            player = {}
+            for(var i=0; i<players.length; i++)
+            {
+                if(players[i].player_id == id)
+                {
+                    player = players[i];
+                }
+            }
+            var name_input = document.getElementById("name");
+            name_input.value = player.name;
+
+            var active_input = document.getElementById("active");
+            active_input.checked = player.active;
+            console.log(id)
+        }
+    }
+</script>
+<title>User Management</title>
+<h1>User Management</h1>
+<div id="user_manager">
+    <form action="{{ url_for('user_mod') }}" method="POST">
+        <table>
+            <thead>
+                <th>
+                    Player
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Active
+                </th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select name="user" id="user" onchange="populate_user()">
+                            <option value=-1 default selected>--select--</option>
+                            {% for player in players_by_name %}
+                                <option value="{{ player.player_id }}">{{ player.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" id="name" name="name" style="width: 20em;">
+                    </td>
+                    <td>
+                        <input type="checkbox" id="active" name="active">
+                    </td>
+                    <td>
+                        <button type="submit">Modify</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+<div id="links at bottom">
+    <p>
+        <a href="/">Table</a> | <a href="user_manager">User Management</a> | <a href="match_manager">Match Management</a>
+    </p>
+</div>
