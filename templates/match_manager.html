@@ -4,11 +4,49 @@
         {% include 'header.html' %}
     {% endblock %}
 <div id="wrapper">
-    <div id="match_manager">
+    <div id="match_report" class="main_table">
+        <form action="{{ url_for('report_result') }}" method="POST">
+            <table>
+                <thead>
+                    <th>
+                        Winner
+                    </th>
+                    <th>
+                        Loser
+                    </th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select name="winner" style="width:20em;">
+                                <option value="" default selected>--select--</option>
+                                {% for player in players_by_name %}
+                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="loser" style="width:20em;">
+                                <option value="" default selected>--select--</option>
+                                {% for player in players_by_name %}
+                                    <option value={{ player.player_id }}>{{ player.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <button type="submit" style="width:8em;">Report Result</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div id="match_manager" class="main_table">
         <table>
             <thead>
                 <tr>
-                    <th>When</th><th>Winner</th><th>Loser</th><th></th>
+                    <th>Date / Time</th><th>Winner</th><th>Loser</th><th></th>
                 </tr>
             </thead>
             <tbody>

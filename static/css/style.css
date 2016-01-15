@@ -32,7 +32,7 @@
         height:100px;
     }
 
-    #ranking_table, #user_manager, #match_manager {
+    .main_table {
         background-color:white;
         padding:25px;
     }
@@ -60,14 +60,4 @@
     td {
         text-align: left;
         border-bottom: 1px solid #ddd;
-    }
-
-    tr:nth-child(odd){
-        color:white;
-        background-color:black;
-    }
-
-    tr:nth-child(even){
-        color:black;
-        background-color:white;
     }

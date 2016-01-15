@@ -4,6 +4,11 @@
         {% include 'header.html' %}
     {% endblock %}
 <div id="wrapper">
+    <style>
+        #add_user_table{
+            width: 24em;
+        }
+    </style>
     <script>
         players = []
         {% for player in players_by_name %}
@@ -33,20 +38,42 @@
             }
         }
     </script>
-    <div id="user_manager">
+    <div id="add_user" class="main_table">
+        <form action="{{ url_for('add_user') }}" method="post">
+            <table id="add_user_table">
+                <caption>Add New Player</caption>
+                <thead>
+                <tr>
+                    <th>New Player Name</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="add_name" style="width: 20em;" /></td>
+                        <td><button type="submit">Add Player</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div id="user_manager" class="main_table">
         <form action="{{ url_for('user_mod') }}" method="POST">
             <table>
+                <caption>Modify User</caption>
                 <thead>
-                    <th>
-                        Player
-                    </th>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Active
-                    </th>
-                    <th></th>
+                    <tr>
+                        <th>
+                            Player
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Active
+                        </th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
                     <tr>

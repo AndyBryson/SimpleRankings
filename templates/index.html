@@ -4,11 +4,23 @@
         {% include 'header.html' %}
     {% endblock %}
 
+<style>
+    tr:nth-child(even){
+        color:white;
+        background-color:black;
+    }
+
+    tr:nth-child(odd){
+        color:black;
+        background-color:white;
+    }
+</style>
+
 <div id="wrapper">
-    <div id="ranking_table">
+    <div id="ranking_table" class="main_table">
         <table>
             <thead>
-                <th style="width: 1em;"></th>
+                <th style="width: 2em;"></th>
                 <th style="min-width: 8em;">Player</th>
                 <th>Played</th>
                 <th>Won</th>
@@ -36,31 +48,5 @@
             {% endfor %}
             </tbody>
         </table>
-    </div>
-    <hr />
-    <div id="report_result">
-        <form action="{{ url_for('report_result') }}" method="POST">
-            <select name="winner">
-                <option value="" default selected>--select--</option>
-                {% for player in players_by_name %}
-                    <option value="{{ player.player_id }}">{{ player.name }}</option>
-                {% endfor %}
-            </select>
-            defeated
-            <select name="loser">
-                <option value="" default selected>--select--</option>
-                {% for player in players_by_name %}
-                    <option value={{ player.player_id }}>{{ player.name }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Report Result</button>
-        </form>
-    </div>
-    <hr />
-    <div id="add_user">
-        <form action="{{ url_for('add_user') }}" method="post">
-            <input type="text" name="name" />
-            <button type="submit">Add User</button>
-        </form>
     </div>
 </div>

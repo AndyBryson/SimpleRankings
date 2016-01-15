@@ -45,17 +45,10 @@ def index():
     return html
 
 
-@app.route('/header.html')
-def show_header():
-    html = render_template('header.html', league_title=ranking_manager.league_title)
-    return html
-
-
-
 @app.route('/add_user', methods=["GET", "POST"])
 def add_user():
     if request.method == 'POST':
-        new_player = request.form["name"]
+        new_player = request.form["add_name"]
         print new_player
         ranking_manager.add_player(new_player)
     return index()
@@ -68,13 +61,14 @@ def report_result():
         loser = request.form.get("loser")
         if winner != loser and winner != "" and loser != "":
             ranking_manager.match(int(winner), int(loser))
-    return index()
+    return match_manager()
 
 
 @app.route('/user_manager')
 def user_manager():
     html = render_template('user_manager.html',
-                           players_by_name=ranking_manager.get_players_in_name_order(True))
+                           players_by_name=ranking_manager.get_players_in_name_order(True),
+                           league_title=ranking_manager.league_title)
     return html
 
 
@@ -97,7 +91,9 @@ def user_mod():
 def match_manager():
     html = render_template('match_manager.html',
                            matches=ranking_manager.matches,
-                           players_dict=ranking_manager.players)
+                           players_dict=ranking_manager.players,
+                           league_title=ranking_manager.league_title,
+                           players_by_name=ranking_manager.get_players_in_name_order())
     return html
 
 
@@ -105,8 +101,8 @@ def match_manager():
 def match_mod():
     if request.method == 'POST':
         match_to_delete = request.form.get("match_to_delete")
-    if match_to_delete != "":
-        ranking_manager.delete_match(int(match_to_delete))
+        if match_to_delete != "":
+            ranking_manager.delete_match(int(match_to_delete))
     return match_manager()
 
 
