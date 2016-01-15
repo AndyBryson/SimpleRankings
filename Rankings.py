@@ -87,7 +87,7 @@ class Manager(object):
         self.matches = []
 
         for match in matches:
-            self.match(match.winner_id, match.loser_id)
+            self.match(match.winner_id, match.loser_id, match.date)
 
     def add_player(self, name, rating=1600):
         if name == "":
@@ -154,7 +154,7 @@ class Manager(object):
             self.recalculate_rankings()
             self.save()
 
-    def match(self, winner, loser):
+    def match(self, winner, loser, date=None):
         if type(winner) is not Player:
             if type(winner) is int:
                 winner = self.get_player(winner)
@@ -167,7 +167,7 @@ class Manager(object):
             else:
                 raise ValueError("winner must be a Player or a player_id", winner)
 
-        self.matches.append(Match(winner.player_id, loser.player_id))
+        self.matches.append(Match(winner.player_id, loser.player_id, date))
 
         winner.match(loser, winner)
 
