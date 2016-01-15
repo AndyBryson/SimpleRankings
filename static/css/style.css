@@ -62,12 +62,12 @@
         border-bottom: 1px solid #ddd;
     }
 
-    #ranking_table.tr:nth-child(odd){
+    tr:nth-child(odd){
         color:white;
         background-color:black;
     }
 
-    #ranking_table.tr:nth-child(even){
+    tr:nth-child(even){
         color:black;
         background-color:white;
     }
