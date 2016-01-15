@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 
-<div id="wrapper">
     {% block content %}
         {% include 'header.html' %}
     {% endblock %}
-
+<div id="wrapper">
     <script>
         players = []
         {% for player in players_by_name %}
