@@ -18,22 +18,20 @@ import time
 
 
 class Match(object):
-    def __init__(self, winner_id=None, loser_id=None, date=None):
+    def __init__(self, result_array=None, date=None):
         if date is None:
             date = time.strftime("%Y-%m-%d %H-%M-%S")
 
         self.date = date
-        self.winner_id = winner_id
-        self.loser_id = loser_id
+        self.result_array = result_array
 
     def to_dict(self):
-        return {"winner_id": self.winner_id, "loser_id": self.loser_id, "date": self.date}
+        return {"result_array": self.result_array, "date": self.date}
 
     @staticmethod
     def from_dict(dict_in):
         m = Match()
-        m.winner_id = dict_in["winner_id"]
-        m.loser_id = dict_in["loser_id"]
+        m.result_array = dict_in["result_array"]
         m.date = dict_in["date"]
         return m
 

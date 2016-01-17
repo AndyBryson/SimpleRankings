@@ -84,7 +84,7 @@ class Manager(object):
         self.matches = []
 
         for match in matches:
-            self.match(match.winner_id, match.loser_id, match.date)
+            self.match(match.result_array, match.date)
 
     def add_player(self, name, rating=1600):
         if name == "":
@@ -151,40 +151,41 @@ class Manager(object):
             self.recalculate_rankings()
             self.save()
 
-    def match(self, winner, loser, date=None):
-        if type(winner) is not Player:
-            if type(winner) is int:
-                winner = self.get_player(winner)
+    def match(self, players_in_order, date=None):
+        result = []
+        for player in players_in_order:
+            if type(player) is Player:
+                result.append(player)
+            elif type(player) is int:
+                result.append(self.get_player(player))
             else:
-                raise ValueError("winner must be a Player or a player_id", winner)
+                raise ValueError("winner must be a Player or a player_id", player)
 
-        if type(loser) is not Player:
-            if type(loser) is int:
-                loser = self.get_player(loser)
-            else:
-                raise ValueError("winner must be a Player or a player_id", winner)
+        player_ids = []
+        for player in result:
+            player_ids.append(player.player_id)
 
-        self.matches.append(Match(winner.player_id, loser.player_id, date))
-
-        winner.match(loser, winner)
-
-        print "winner {}".format(winner)
-        print "loser {}".format(loser)
-
+        self.matches.append(Match(player_ids, date))
+        self.apply_points(result)
         self.save()
+
+    def apply_points(self, result):
+        for i in range(0, len(result) - 1):
+            print i
 
 
 if __name__ == "__main__":
-    m=Manager()
+    m = Manager()
     m.add_player("Andy")
     m.add_player("Bob")
     m.add_player("Test")
-    m.match(0, 1)
+    m.match([0, 1])
     m.add_player("Dave")
-    m.match(0,3)
-    m_string=m.to_json()
+    m.match([0,3])
+    m.match([0, 1, 2, 3])
+    m_string = m.to_json()
 
-    other=Manager()
+    other = Manager()
     other.from_json(m_string)
 
     print other.to_json()
