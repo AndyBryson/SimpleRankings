@@ -69,7 +69,10 @@ class Player(object):
 
     def adjust_rating(self, adjustment, position, player_count):
         self.played_match = True
-        self.rating += adjustment
+
+        k = max((30 - self.match_count), 16)
+
+        self.rating += k * adjustment
         self.match_count += 1
         percent = ((player_count - position) / (player_count - 1)) * 100
 
@@ -81,9 +84,9 @@ class Player(object):
             self.win_count += 1
 
     @staticmethod
-    def calculate_rating_change(winner, loser, k=20):
+    def calculate_rating_change(winner, loser):
         exp_score_a = Player.get_exp_score_a(winner.rating, loser.rating)
-        change = k * (1 - exp_score_a)
+        change = (1 - exp_score_a)
         return change
 
     @staticmethod
