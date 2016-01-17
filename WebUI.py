@@ -13,12 +13,10 @@ __maintainer__ = "Andy Bryson"
 __email__ = "agbryson@gmail.com"
 __status__ = "Development"
 
-from flask import Flask, render_template, send_from_directory, request
-import os
 import inspect
+import os
 
-from Rankings import Manager
-
+from flask import Flask, render_template, send_from_directory, request
 
 app = Flask(__name__
             , static_folder=os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), 'static')
