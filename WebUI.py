@@ -55,10 +55,24 @@ def add_user():
 @app.route('/report_result', methods=["GET", "POST"])
 def report_result():
     if request.method == 'POST':
-        winner = request.form.get("winner")
-        loser = request.form.get("loser")
-        if winner != loser and winner != "" and loser != "":
-            ranking_manager.match(int(winner), int(loser))
+        raw_results = [ request.form.get("1st"),
+                        request.form.get("2nd"),
+                        request.form.get("3rd"),
+                        request.form.get("4th"),
+                        request.form.get("5th"),
+                        request.form.get("6th") ]
+
+        proper_results = []
+        for player in raw_results:
+            if player == "":
+                continue
+
+            if int(player) not in proper_results:
+                proper_results.append(int(player))
+
+        if len(proper_results) > 1:
+            ranking_manager.match(proper_results)
+
     return match_manager()
 
 

@@ -9,38 +9,87 @@
             <table>
                 <caption>Match Report</caption>
                 <thead>
-                    <th>
-                        Winner
-                    </th>
-                    <th>
-                        Loser
-                    </th>
                     <th></th>
+                    <th>
+                        Player
+                    </th>
                 </thead>
                 <tbody>
                     <tr>
+                        <th>1st</th>
                         <td>
-                            <select name="winner" style="width:20em;">
+                            <select name="1st" style="width:20em;">
                                 <option value="" default selected>--select--</option>
                                 {% for player in players_by_name %}
                                     <option value="{{ player.player_id }}">{{ player.name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
+                    </tr>
+
+                    <tr>
+                        <th>2nd</th>
                         <td>
-                            <select name="loser" style="width:20em;">
+                            <select name="2nd" style="width:20em;">
                                 <option value="" default selected>--select--</option>
                                 {% for player in players_by_name %}
-                                    <option value={{ player.player_id }}>{{ player.name }}</option>
+                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
+                    </tr>
+
+                    <tr>
+                        <th>3rd</th>
                         <td>
-                            <button type="submit" style="width:8em;">Report Result</button>
+                            <select name="3rd" style="width:20em;">
+                                <option value="" default selected>--select--</option>
+                                {% for player in players_by_name %}
+                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                {% endfor %}
+                            </select>
                         </td>
                     </tr>
+
+                    <tr>
+                        <th>4th</th>
+                        <td>
+                            <select name="4th" style="width:20em;">
+                                <option value="" default selected>--select--</option>
+                                {% for player in players_by_name %}
+                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>5th</th>
+                        <td>
+                            <select name="5th" style="width:20em;">
+                                <option value="" default selected>--select--</option>
+                                {% for player in players_by_name %}
+                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>6th</th>
+                        <td>
+                            <select name="6th" style="width:20em;">
+                                <option value="" default selected>--select--</option>
+                                {% for player in players_by_name %}
+                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+
                 </tbody>
             </table>
+            <button type="submit" style="width:8em;">Report Result</button>
         </form>
     </div>
     <div id="match_manager" class="main_table">
@@ -48,7 +97,7 @@
             <caption>Match Log</caption>
             <thead>
                 <tr>
-                    <th>Date / Time</th><th>Winner</th><th>Loser</th><th></th>
+                    <th>Date / Time</th><th>Result</th><th></th>
                 </tr>
             </thead>
             <tbody>
@@ -57,9 +106,11 @@
                 <form action="{{ url_for('match_mod') }}" method="POST">
                     <tr>
                         <td>{{ match.date }}</td>
-                        {% set winner_name = players_dict[match.winner_id].name %}
-                        <td style="min-width: 8em;">{{ winner_name }}</td>
-                        <td style="min-width: 8em;">{{ players_dict[match.loser_id].name }}</td>
+                        <td style="min-width: 8em;">
+                            {% for player_id in match.result_array %}
+                                {{ players_dict[player_id].name }},
+                            {% endfor %}
+                        </td>
                         <td>
                             <button type="submit" value={{ index }} name="match_to_delete">Delete</button>
                         </td>

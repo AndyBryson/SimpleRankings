@@ -19,11 +19,12 @@ __status__ = "Development"
 class Player(object):
     def __init__(self, player_id=None, name=None, rating=1600, active=True):
         self.player_id = player_id
-        self.rating = rating
         self.name = name
         self.active = active
+        self.rating = rating
         self.played_match = False
         self.match_count = 0
+        self.win_count = 0
         self.percent = 0
 
     def total_matches(self):
@@ -35,6 +36,7 @@ class Player(object):
                 "name": self.name,
                 "active": self.active,
                 "match_count": self.match_count,
+                "win_count": self.win_count,
                 "percent": self.percent}
 
     @staticmethod
@@ -45,6 +47,7 @@ class Player(object):
         p.name = dict_in["name"]
         p.active = dict_in["active"]
         p.match_count = dict_in["match_count"]
+        p.win_count = dict_in["win_count"]
         p.percent = dict_in["percent"]
         return p
 
@@ -60,6 +63,9 @@ class Player(object):
     def reset(self):
         self.rating = 1600
         self.played_match = False
+        self.match_count = 0
+        self.win_count = 0
+        self.percent = 0
 
     def adjust_rating(self, adjustment, position, player_count):
         self.played_match = True
@@ -70,6 +76,9 @@ class Player(object):
         percent_diff = (percent - self.percent) / self.match_count
 
         self.percent += percent_diff
+
+        if position is 1:
+            self.win_count += 1
 
     @staticmethod
     def calculate_rating_change(winner, loser, k=20):

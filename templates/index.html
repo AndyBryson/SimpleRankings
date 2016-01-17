@@ -24,8 +24,7 @@
                 <th style="min-width: 8em;">Player</th>
                 <th>Played</th>
                 <th>Won</th>
-                <th>Lost</th>
-                <th>%</th>
+                <th>Ave pos %</th>
                 <th>Rating</th>
             </thead>
 
@@ -34,15 +33,9 @@
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>{{ player.name }}</td>
-                    {% set match_count = player.wins + player.losses %}
-                    <td>{{ match_count }}</td>
-                    <td>{{ player.wins }}</td>
-                    <td>{{ player.losses }}</td>
-                    {% set percent = 0 %}
-                    {% if match_count %}
-                        {% set percent = ((player.wins / match_count)*100)|round|int %}
-                    {% endif %}
-                    <td>{{ percent }}</td>
+                    <td>{{ player.match_count }}</td>
+                    <td>{{ player.win_count }}</td>
+                    <td>{{ player.percent|round(2) }}</td>
                     <td>{{ player.rating|round|int }}</td>
                 </tr>
             {% endfor %}

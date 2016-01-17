@@ -38,12 +38,12 @@ class Manager(object):
             self.load()
 
     def save(self):
-        with open("settings.txt", "w") as outfile:
+        with open("data.txt", "w") as outfile:
             json.dump(self.to_json(), outfile, indent=2)
 
     def load(self):
-        if os.path.isfile("settings.txt"):
-            with open("settings.txt", "r") as in_file:
+        if os.path.isfile("data.txt"):
+            with open("data.txt", "r") as in_file:
                 self.from_json(json.load(in_file))
 
     def from_dict(self, dict_in):
