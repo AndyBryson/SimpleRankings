@@ -4,6 +4,12 @@
 Manager.py: Manager for a rankings system based on chess rankings
 """
 
+import json
+import os.path
+
+from Player import Player
+from Match import Match
+
 __author__ = "Andy Bryson"
 __copyright__ = "Copyright 2016, Andy Bryson"
 __credits__ = ["Andy Bryson"]
@@ -12,12 +18,6 @@ __version__ = "0.0.1"
 __maintainer__ = "Andy Bryson"
 __email__ = "agbryson@gmail.com"
 __status__ = "Development"
-
-import json
-import os.path
-
-from Player import Player
-from Match import Match
 
 
 def get_next_key(dict_in):
@@ -169,23 +169,45 @@ class Manager(object):
         self.apply_points(result)
         self.save()
 
-    def apply_points(self, result):
-        for i in range(0, len(result) - 1):
-            print i
+    @staticmethod
+    def apply_points(result):
+        rating_changes = []
+        for x in result:
+            rating_changes.append(0)
+
+        # This divisor is used to make sure that the winner gets the same points as he would for just beating one
+        # person, even if they beat 10
+        divisor = len(result) - 1
+
+        for i in range(0, len(result)):
+            for j in range(i + 1, len(result)):
+                rating_change = Player.calculate_rating_change(result[i], result[j]) / divisor
+                rating_changes[i] += rating_change
+                rating_changes[j] -= rating_change
+
+        for i in range(0, len(result)):
+            player = result[i]
+            rating_change = rating_changes[i]
+            player.adjust_rating(rating_change, i+1, len(result))
 
 
 if __name__ == "__main__":
-    m = Manager()
+    m = Manager(False)
     m.add_player("Andy")
     m.add_player("Bob")
     m.add_player("Test")
-    m.match([0, 1])
     m.add_player("Dave")
-    m.match([0,3])
     m.match([0, 1, 2, 3])
+    m.match([3, 2, 1, 0])
     m_string = m.to_json()
 
     other = Manager()
     other.from_json(m_string)
 
     print other.to_json()
+
+    players = m.get_players_in_rank_order()
+    total = 0
+    for player in players:
+        total += player.rating
+    print total / len(players)

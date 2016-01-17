@@ -4,6 +4,8 @@
 Match.py: A set of tools to run a rankings system based on chess rankings
 """
 
+import time
+
 __author__ = "Andy Bryson"
 __copyright__ = "Copyright 2016, Andy Bryson"
 __credits__ = ["Andy Bryson"]
@@ -12,9 +14,6 @@ __version__ = "0.0.1"
 __maintainer__ = "Andy Bryson"
 __email__ = "agbryson@gmail.com"
 __status__ = "Development"
-
-
-import time
 
 
 class Match(object):

@@ -4,6 +4,8 @@
 Player.py: Information and helper methods for a player
 """
 
+from __future__ import division
+
 __author__ = "Andy Bryson"
 __copyright__ = "Copyright 2016, Andy Bryson"
 __credits__ = ["Andy Bryson"]
@@ -21,15 +23,19 @@ class Player(object):
         self.name = name
         self.active = active
         self.played_match = False
-        self.wins = 0
-        self.losses = 0
-        self.draws = 0
+        self.match_count = 0
+        self.percent = 0
 
     def total_matches(self):
-        return self.wins + self.losses + self.draws
+        return self.match_count
 
     def to_dict(self):
-        return {"player_id": self.player_id, "rating": self.rating, "name": self.name, "active": self.active}
+        return {"player_id": self.player_id,
+                "rating": self.rating,
+                "name": self.name,
+                "active": self.active,
+                "match_count": self.match_count,
+                "percent": self.percent}
 
     @staticmethod
     def from_dict(dict_in):
@@ -38,6 +44,8 @@ class Player(object):
         p.rating = dict_in["rating"]
         p.name = dict_in["name"]
         p.active = dict_in["active"]
+        p.match_count = dict_in["match_count"]
+        p.percent = dict_in["percent"]
         return p
 
     def __repr__(self):
@@ -52,42 +60,22 @@ class Player(object):
     def reset(self):
         self.rating = 1600
         self.played_match = False
-        self.wins = 0
-        self.losses = 0
-        self.draws = 0
+
+    def adjust_rating(self, adjustment, position, player_count):
+        self.played_match = True
+        self.rating += adjustment
+        self.match_count += 1
+        percent = ((player_count - position) / (player_count - 1)) * 100
+
+        percent_diff = (percent - self.percent) / self.match_count
+
+        self.percent += percent_diff
 
     @staticmethod
-    def get_rating_change(winner, loser):
+    def calculate_rating_change(winner, loser, k=20):
         exp_score_a = Player.get_exp_score_a(winner.rating, loser.rating)
-        print exp_score_a
-
-
-    def match(self, other, result):
-        exp_score_a = Player.get_exp_score_a(self.rating, other.rating)
-
-        print exp_score_a
-
-        if result == self:
-            self.rating_adj(exp_score_a, 1)
-            other.rating_adj(1 - exp_score_a, 0)
-        elif result == other:
-            self.rating_adj(exp_score_a, 0)
-            other.rating_adj(1 - exp_score_a, 1)
-        elif result == 'Draw':
-            self.rating_adj(exp_score_a, 0.5)
-            other.rating_adj(1 - exp_score_a, 0.5)
-
-    def rating_adj(self, exp_score, score, k=20):
-        if score is 1:
-            self.wins += 1
-        elif score is 0:
-            self.losses +=1
-        else:
-            self.draws += 1
-        change = k * (score - exp_score)
-        self.rating += change
-        self.played_match = True
-        print "score: {}, exp_score: {}, change: {}, rating: {}".format(score, exp_score, change, self.rating)
+        change = k * (1 - exp_score_a)
+        return change
 
     @staticmethod
     def get_exp_score_a(rating_a, rating_b):
