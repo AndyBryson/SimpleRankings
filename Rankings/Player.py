@@ -56,6 +56,12 @@ class Player(object):
         self.losses = 0
         self.draws = 0
 
+    @staticmethod
+    def get_rating_change(winner, loser):
+        exp_score_a = Player.get_exp_score_a(winner.rating, loser.rating)
+        print exp_score_a
+
+
     def match(self, other, result):
         exp_score_a = Player.get_exp_score_a(self.rating, other.rating)
 
