@@ -65,6 +65,8 @@ class Player(object):
     def match(self, other, result):
         exp_score_a = Player.get_exp_score_a(self.rating, other.rating)
 
+        print exp_score_a
+
         if result == self:
             self.rating_adj(exp_score_a, 1)
             other.rating_adj(1 - exp_score_a, 0)
@@ -82,8 +84,10 @@ class Player(object):
             self.losses +=1
         else:
             self.draws += 1
-        self.rating += k * (score - exp_score)
+        change = k * (score - exp_score)
+        self.rating += change
         self.played_match = True
+        print "score: {}, exp_score: {}, change: {}, rating: {}".format(score, exp_score, change, self.rating)
 
     @staticmethod
     def get_exp_score_a(rating_a, rating_b):
