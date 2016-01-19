@@ -15,5 +15,5 @@ Install `python 2.7` and `flask`.
 #### Run
 
 ```
-python __init__.py -n "Name of your league"
+python __init__.py -n "Name of your league -s "Your sport"
 ```
