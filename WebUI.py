@@ -80,6 +80,7 @@ def report_result():
 @app.route('/user_manager')
 def user_manager():
     html = render_template('user_manager.html',
+                           sport=ranking_manager.sport,
                            players_by_name=ranking_manager.get_players_in_name_order(True),
                            league_title=ranking_manager.league_title)
     return html
@@ -103,6 +104,7 @@ def user_mod():
 @app.route('/match_manager')
 def match_manager():
     html = render_template('match_manager.html',
+                           sport=ranking_manager.sport,
                            matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
                            league_title=ranking_manager.league_title,
