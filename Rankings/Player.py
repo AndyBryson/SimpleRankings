@@ -9,7 +9,7 @@ from __future__ import division
 __author__ = "Andy Bryson"
 __copyright__ = "Copyright 2016, Andy Bryson"
 __credits__ = ["Andy Bryson"]
-__license__ = "MIT"
+__license__ = "GPLv3"
 __version__ = "0.0.1"
 __maintainer__ = "Andy Bryson"
 __email__ = "agbryson@gmail.com"
