@@ -69,14 +69,31 @@
         padding:0;
         margin:0;
         background-color:#ffdf43;
+        height: 55px;
+        vertical-align: text-bottom;
+    }
+
+    #under_banner {
+        padding:0;
+        margin:0;
+        background-color:#ffdf43;
         border-bottom: 1px solid black;
-        height:60px;
+        height:2px;
+        clear: both;
+    }
+
+
+    #banner span {
+        font-family: 'Gill Sans MT', 'Gill Sans', Calibri, sans-serif;
+        font-size: 28px;
     }
     
     img.banner {
-        width:1024px;
-        margin-left: 0;
-        padding:0;
+        height:50px;
+        margin-left: 15px;
+        margin-top: 5px;
+        padding: 0;
+        float: left;
     }
     
     span.banner {

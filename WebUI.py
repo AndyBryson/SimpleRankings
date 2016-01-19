@@ -36,6 +36,7 @@ def send_css(path):
 @app.route('/')
 def index():
     html = render_template('index.html',
+                           sport=ranking_manager.sport,
                            league_title=ranking_manager.league_title,
                            ranking_manager=ranking_manager,
                            players_by_rank=ranking_manager.get_players_in_rank_order(),

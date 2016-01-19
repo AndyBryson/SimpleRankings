@@ -33,6 +33,7 @@ class Manager(object):
         self.players = {}
         self.matches = []
         self.league_title = ""
+        self.sport = ""
 
         if load:
             self.load()
@@ -57,6 +58,9 @@ class Manager(object):
 
         self.league_title = dict_in["league_title"]
 
+        if "sport" in dict_in:
+            self.sport = dict_in["sport"]
+
         self.recalculate_rankings()
 
     def from_json(self, json_in):
@@ -71,7 +75,7 @@ class Manager(object):
         for match in self.matches:
             matches_arr.append(match.to_dict())
 
-        return {"players": players_arr, "matches": matches_arr, "league_title": self.league_title}
+        return {"players": players_arr, "matches": matches_arr, "league_title": self.league_title, "sport": self.sport}
 
     def to_json(self):
         return json.dumps(self.to_dict())
