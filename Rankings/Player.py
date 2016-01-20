@@ -67,29 +67,5 @@ class Player(object):
         self.win_count = 0
         self.percent = 0
 
-    def adjust_rating(self, adjustment, position, player_count):
-        self.played_match = True
 
-        k = max((30 - self.match_count), 16)
-
-        self.rating += k * adjustment
-        self.match_count += 1
-        percent = ((player_count - position) / (player_count - 1)) * 100
-
-        percent_diff = (percent - self.percent) / self.match_count
-
-        self.percent += percent_diff
-
-        if position is 1:
-            self.win_count += 1
-
-    @staticmethod
-    def calculate_rating_change(winner, loser):
-        exp_score_a = Player.get_exp_score_a(winner.rating, loser.rating)
-        change = (1 - exp_score_a)
-        return change
-
-    @staticmethod
-    def get_exp_score_a(rating_a, rating_b):
-        return 1.0 / (1 + 10**((rating_b - rating_a)/400.0))
 

@@ -6,6 +6,7 @@ Manager.py: Manager for a rankings system based on chess rankings
 
 import json
 import os.path
+from ConfigParser import ConfigParser
 
 from Player import Player
 from Match import Match
@@ -29,14 +30,27 @@ def get_next_key(dict_in):
 
 
 class Manager(object):
-    def __init__(self, load=True):
+    def __init__(self, config, load=True):
         self.players = {}
         self.matches = []
-        self.league_title = ""
-        self.sport = ""
+        self.__config = config
+        self.__init_config()
 
         if load:
             self.load()
+
+    def __init_config(self):
+        if self.__config.has_section("rankings") is False:
+            self.__config.add_section("rankings")
+
+        if self.__config.has_option("rankings", "initial_k") is False:
+            self.__config.set("rankings", "initial_k", 30)
+
+        if self.__config.has_option("rankings", "standard_k") is False:
+            self.__config.set("rankings", "standard_k", 16)
+
+        with open(self.__config.file_name, 'wb') as configfile:
+            self.__config.write(configfile)
 
     def save(self):
         with open("data.txt", "w") as outfile:
@@ -56,11 +70,6 @@ class Manager(object):
         for match in dict_in["matches"]:
             self.matches.append(Match.from_dict(match))
 
-        self.league_title = dict_in["league_title"]
-
-        if "sport" in dict_in:
-            self.sport = dict_in["sport"]
-
         self.recalculate_rankings()
 
     def from_json(self, json_in):
@@ -75,7 +84,7 @@ class Manager(object):
         for match in self.matches:
             matches_arr.append(match.to_dict())
 
-        return {"players": players_arr, "matches": matches_arr, "league_title": self.league_title, "sport": self.sport}
+        return {"players": players_arr, "matches": matches_arr, }
 
     def to_json(self):
         return json.dumps(self.to_dict())
@@ -173,8 +182,7 @@ class Manager(object):
         self.apply_points(result)
         self.save()
 
-    @staticmethod
-    def apply_points(result):
+    def apply_points(self, result):
         rating_changes = []
         for x in result:
             rating_changes.append(0)
@@ -185,14 +193,41 @@ class Manager(object):
 
         for i in range(0, len(result)):
             for j in range(i + 1, len(result)):
-                rating_change = Player.calculate_rating_change(result[i], result[j]) / divisor
+                rating_change = Manager.calculate_rating_change(result[i], result[j]) / divisor
                 rating_changes[i] += rating_change
                 rating_changes[j] -= rating_change
 
         for i in range(0, len(result)):
             player = result[i]
             rating_change = rating_changes[i]
-            player.adjust_rating(rating_change, i+1, len(result))
+            self.adjust_player_rating(player, rating_change, i+1, len(result))
+
+    @staticmethod
+    def calculate_rating_change(winner, loser):
+        exp_score_a = Manager.get_exp_score_a(winner.rating, loser.rating)
+        change = (1 - exp_score_a)
+        return change
+
+    @staticmethod
+    def get_exp_score_a(rating_a, rating_b):
+        return 1.0 / (1 + 10**((rating_b - rating_a)/400.0))
+
+    def adjust_player_rating(self, player, adjustment, position, player_count):
+        player.played_match = True
+
+        k = max((self.__config.getint("rankings", "initial_k") - player.match_count),
+                self.__config.getint("rankings", "standard_k"))
+
+        player.rating += k * adjustment
+        player.match_count += 1
+        percent = ((player_count - position) / (player_count - 1)) * 100
+
+        percent_diff = (percent - player.percent) / player.match_count
+
+        player.percent += percent_diff
+
+        if position is 1:
+            player.win_count += 1
 
 
 if __name__ == "__main__":
@@ -205,7 +240,10 @@ if __name__ == "__main__":
     m.match([3, 2, 1, 0])
     m_string = m.to_json()
 
-    other = Manager()
+    config = ConfigParser()
+    config.file_name = "config.txt"
+
+    other = Manager(config)
     other.from_json(m_string)
 
     print other.to_json()

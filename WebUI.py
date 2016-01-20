@@ -15,6 +15,7 @@ __status__ = "Development"
 
 import inspect
 import os
+from ConfigParser import ConfigParser
 
 from flask import Flask, render_template, send_from_directory, request
 
@@ -36,8 +37,8 @@ def send_css(path):
 @app.route('/')
 def index():
     html = render_template('index.html',
-                           sport=ranking_manager.sport,
-                           league_title=ranking_manager.league_title,
+                           sport=config.get("ui", "sport"),
+                           league_title=config.get("ui", "league_title"),
                            ranking_manager=ranking_manager,
                            players_by_rank=ranking_manager.get_players_in_rank_order(),
                            players_by_name=ranking_manager.get_players_in_name_order())
@@ -80,9 +81,9 @@ def report_result():
 @app.route('/user_manager')
 def user_manager():
     html = render_template('user_manager.html',
-                           sport=ranking_manager.sport,
+                           sport=config.get("ui", "sport"),
                            players_by_name=ranking_manager.get_players_in_name_order(True),
-                           league_title=ranking_manager.league_title)
+                           league_title=config.get("ui", "league_title"))
     return html
 
 
@@ -104,10 +105,10 @@ def user_mod():
 @app.route('/match_manager')
 def match_manager():
     html = render_template('match_manager.html',
-                           sport=ranking_manager.sport,
+                           sport=config.get("ui", "sport"),
                            matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
-                           league_title=ranking_manager.league_title,
+                           league_title=config.get("ui", "league_title"),
                            players_by_name=ranking_manager.get_players_in_name_order())
     return html
 
@@ -132,18 +133,34 @@ def start_flask(host, port):
             port=port)
 
 
-ranking_manager=None
+ranking_manager = None
+config = None
 
 
 class FlaskInterface(object):
-    def __init__(self, manager, host="0.0.0.0", port=180):
+    def __init__(self, config_in, manager):
         global ranking_manager
+        self.__config = config_in
+        self.init_config()
         ranking_manager = manager
-        self.__host = host
-        self.__port = port
+        global config
+        config = config_in
+
+    def init_config(self):
+        if self.__config.has_section("ui") is False:
+            self.__config.add_section("ui")
+
+        if self.__config.has_option("ui", "host") is False:
+            self.__config.set("ui", "host", "0.0.0.0")
+
+        if self.__config.has_option("ui", "port") is False:
+            self.__config.set("ui", "port", 180)
+
+        with open(self.__config.file_name, 'wb') as configfile:
+            self.__config.write(configfile)
 
     def start(self):
-        start_flask(self.__host, self.__port)
+        start_flask(self.__config.get("ui", "host"), self.__config.getint("ui", "port"))
         print("start")
 
 

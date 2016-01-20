@@ -1,10 +1,15 @@
 import argparse
+from ConfigParser import ConfigParser
 
 from Rankings import Manager
 from WebUI import FlaskInterface
 
 
 if __name__ == "__main__":
+    config = ConfigParser()
+    config.file_name = "config.txt"
+    config.read(config.file_name)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--name", type=str,
                         help="What is the league called (for display)",
@@ -13,13 +18,25 @@ if __name__ == "__main__":
                         help="What sport are you playing (for display)",
                         default=None)
     args = parser.parse_args()
-    ranking_manager = Manager()
+
+    if config.has_section("ui") is False:
+        config.add_section("ui")
+
     if args.name is not None:
-        ranking_manager.league_title = args.name
+        config.set("ui", "league_title", args.name)
+    elif config.has_option("ui", "league_title") is False:
+        config.set("ui", "league_title", "")
 
     if args.sport is not None:
-        ranking_manager.sport = args.sport
+        config.set("ui", "sport", args.sport)
+    elif config.has_option("ui", "sport") is False:
+        config.set("ui", "sport", "")
 
-    flask_interface = FlaskInterface(ranking_manager)
+    with open(config.file_name, 'wb') as configfile:
+        config.write(configfile)
+
+    ranking_manager = Manager(config)
+
+    flask_interface = FlaskInterface(config, ranking_manager)
     flask_interface.start()
 
