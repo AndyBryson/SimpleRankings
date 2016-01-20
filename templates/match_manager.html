@@ -21,7 +21,7 @@
                             <select name="1st" style="width:20em;">
                                 <option value="" default selected>--select--</option>
                                 {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -33,7 +33,7 @@
                             <select name="2nd" style="width:20em;">
                                 <option value="" default selected>--select--</option>
                                 {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -45,7 +45,7 @@
                             <select name="3rd" style="width:20em;">
                                 <option value="" default selected>None</option>
                                 {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -57,7 +57,7 @@
                             <select name="4th" style="width:20em;">
                                 <option value="" default selected>None</option>
                                 {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -69,7 +69,7 @@
                             <select name="5th" style="width:20em;">
                                 <option value="" default selected>None</option>
                                 {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -81,7 +81,7 @@
                             <select name="6th" style="width:20em;">
                                 <option value="" default selected>None</option>
                                 {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.name }}</option>
+                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -108,7 +108,7 @@
                         <td>{{ match.date }}</td>
                         <td style="min-width: 8em;">
                             {% for player_id in match.result_array %}
-                                {{ players_dict[player_id].name }},
+                                {{ players_dict[player_id].short_name }},
                             {% endfor %}
                         </td>
                         <td>

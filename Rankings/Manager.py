@@ -105,7 +105,7 @@ class Manager(object):
             return -1
 
         for player in self.players.values():
-            if player.name == name:
+            if player.long_name == name:
                 # TODO A: raise and handle an exception
                 return -1
 

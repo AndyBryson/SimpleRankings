@@ -32,7 +32,7 @@
             {% for player in players_by_rank %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ player.name }}</td>
+                    <td>{{ player.long_name }}</td>
                     <td>{{ player.match_count }}</td>
                     <td>{{ player.win_count }}</td>
                     <td>{{ player.percent|round(2) }}</td>

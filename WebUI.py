@@ -4,6 +4,14 @@
 WebUI.py: A web UI for a Rankings object
 """
 
+import inspect
+import os
+from Rankings import Manager
+from ConfigParser import ConfigParser
+
+from flask import Flask, render_template, send_from_directory, request
+
+
 __author__ = "Andy Bryson"
 __copyright__ = "Copyright 2016, Andy Bryson"
 __credits__ = ["Andy Bryson"]
@@ -13,12 +21,6 @@ __maintainer__ = "Andy Bryson"
 __email__ = "agbryson@gmail.com"
 __status__ = "Development"
 
-import inspect
-import os
-from Manager import Manager
-from ConfigParser import ConfigParser
-
-from flask import Flask, render_template, send_from_directory, request
 
 app = Flask(__name__
             , static_folder=os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), 'static')
@@ -41,8 +43,7 @@ def index():
                            sport=config.get("ui", "sport"),
                            league_title=config.get("ui", "league_title"),
                            ranking_manager=ranking_manager,
-                           players_by_rank=get_players_in_rank_order(),
-                           players_by_name=get_players_in_name_order())
+                           players_by_rank=get_players_in_rank_order())
     return html
 
 
@@ -129,7 +130,7 @@ def head_to_heads():
     players = get_players_in_name_order()
     player_ids = []
     for player in players:
-        headings.append(player.name)
+        headings.append(player.short_name)
         player_ids.append(player.player_id)
 
     matrix = [0 for player in players]
@@ -165,7 +166,7 @@ def head_to_heads():
     return html
 
 
-def get_players_in_rank_order(self, include_inactive=False):
+def get_players_in_rank_order(include_inactive=False):
     players = ranking_manager.players.values()
     players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
     if include_inactive is True:
@@ -174,9 +175,9 @@ def get_players_in_rank_order(self, include_inactive=False):
         return Manager.remove_inactive(players)
 
 
-def get_players_in_name_order(self, include_inactive=False):
+def get_players_in_name_order(include_inactive=False):
     players = ranking_manager.players.values()
-    players.sort(key=lambda x: x.name.lower())
+    players.sort(key=lambda x: x.short_name.lower())
     if include_inactive is True:
         return players
     else:
