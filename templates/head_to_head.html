@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+    {% block content %}
+        {% include 'header.html' %}
+    {% endblock %}
+<div id="wrapper">
+    <div id="match_manager" class="main_table">
+        <table>
+            <thead>
+                <th><div class="vertical-text"><span class="vertical-text__inner"></span></div></th>
+                {% for header in headings %}
+                <th><div class="vertical-text"><span class="vertical-text__inner">{{ header }}</span></div></th>
+                {% endfor %}
+            </thead>
+            <tbody>
+                {% for i in range(0, headings|length) %}
+                <tr>
+                    <th>{{ headings[i] }}</th>
+                    {% for j in range(0, headings|length) %}
+                        {% if i == j %}
+                        <td style="background-color: #ffdf43;"></td>
+                        {% else %}
+                        <td style="text-align:center">{{ matrix[i][j] }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>

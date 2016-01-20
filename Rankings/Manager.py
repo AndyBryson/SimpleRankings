@@ -134,22 +134,6 @@ class Manager(object):
             player.active = active
             self.save()
 
-    def get_players_in_rank_order(self, include_inactive=False):
-        players = self.players.values()
-        players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
-        if include_inactive is True:
-            return players
-        else:
-            return Manager.remove_inactive(players)
-
-    def get_players_in_name_order(self, include_inactive=False):
-        players = self.players.values()
-        players.sort(key=lambda x: x.name)
-        if include_inactive is True:
-            return players
-        else:
-            return Manager.remove_inactive(players)
-
     @staticmethod
     def remove_inactive(players):
         return [x for x in players if x.active]

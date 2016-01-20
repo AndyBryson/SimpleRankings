@@ -128,9 +128,33 @@
         background-color:#f2f2e9;
     }
 
-    table {
+    .full-size {
         border-collapse: collapse;
         width:100%;
+    }
+
+    /*
+       Vertical text
+       by @kizmarh
+    */
+    .vertical-text {
+        display: inline-block;
+        overflow: hidden;
+        width: 1.5em;
+    }
+
+    .vertical-text__inner {
+        display: inline-block;
+        white-space: nowrap;
+        line-height: 1.5;
+        transform: translate(0,100%) rotate(-90deg);
+        transform-origin: 0 0;
+    }
+
+    .vertical-text__inner:after {
+        content: "";
+        display: block;
+        margin: -1.5em 0 100%;
     }
 
     th {

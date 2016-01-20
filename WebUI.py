@@ -15,6 +15,7 @@ __status__ = "Development"
 
 import inspect
 import os
+from Manager import Manager
 from ConfigParser import ConfigParser
 
 from flask import Flask, render_template, send_from_directory, request
@@ -40,8 +41,8 @@ def index():
                            sport=config.get("ui", "sport"),
                            league_title=config.get("ui", "league_title"),
                            ranking_manager=ranking_manager,
-                           players_by_rank=ranking_manager.get_players_in_rank_order(),
-                           players_by_name=ranking_manager.get_players_in_name_order())
+                           players_by_rank=get_players_in_rank_order(),
+                           players_by_name=get_players_in_name_order())
     return html
 
 
@@ -82,7 +83,7 @@ def report_result():
 def user_manager():
     html = render_template('user_manager.html',
                            sport=config.get("ui", "sport"),
-                           players_by_name=ranking_manager.get_players_in_name_order(True),
+                           players_by_name=get_players_in_name_order(True),
                            league_title=config.get("ui", "league_title"))
     return html
 
@@ -109,7 +110,7 @@ def match_manager():
                            matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
                            league_title=config.get("ui", "league_title"),
-                           players_by_name=ranking_manager.get_players_in_name_order())
+                           players_by_name=get_players_in_name_order())
     return html
 
 
@@ -120,6 +121,66 @@ def match_mod():
         if match_to_delete != "":
             ranking_manager.delete_match(int(match_to_delete))
     return match_manager()
+
+
+@app.route('/head_to_head')
+def head_to_heads():
+    headings = []
+    players = get_players_in_name_order()
+    player_ids = []
+    for player in players:
+        headings.append(player.name)
+        player_ids.append(player.player_id)
+
+    matrix = [0 for player in players]
+    for i in range(0, len(matrix)):
+        matrix[i] = [0 for player in players]
+
+    for i in range(0, len(player_ids)):
+        for j in range(0, len(player_ids)):
+            if i is j:
+                matrix[i][j] = "X"
+            else:
+                count = 0
+                for match in ranking_manager.matches:
+                    i_found = False
+                    for player_id in match.result_array:
+                        if player_id is player_ids[i]:
+                            i_found = True
+                            continue
+
+                        if player_id is player_ids[j]:
+                            if i_found is True:
+                                count += 1
+                            else:
+                                break
+
+                matrix[i][j] = count
+
+    html = render_template('head_to_head.html',
+                           sport=config.get("ui", "sport"),
+                           headings=headings,
+                           matrix=matrix,
+                           league_title=config.get("ui", "league_title"))
+    return html
+
+
+def get_players_in_rank_order(self, include_inactive=False):
+    players = ranking_manager.players.values()
+    players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
+    if include_inactive is True:
+        return players
+    else:
+        return Manager.remove_inactive(players)
+
+
+def get_players_in_name_order(self, include_inactive=False):
+    players = ranking_manager.players.values()
+    players.sort(key=lambda x: x.name.lower())
+    if include_inactive is True:
+        return players
+    else:
+        return Manager.remove_inactive(players)
 
 
 @app.route('/<path:path>')
