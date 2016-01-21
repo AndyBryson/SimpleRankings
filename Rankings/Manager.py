@@ -37,6 +37,10 @@ class Manager(object):
         self.__config = config
         self.__init_config()
 
+        self.__initial_k = self.__config.getint("rankings", "initial_k")
+        self.__standard_k = self.__config.getint("rankings", "standard_k")
+        self.__normalise_many_player_games = self.__config.getboolean("rankings", "normalise_many_player_games")
+
         if load:
             self.load()
 
@@ -49,6 +53,9 @@ class Manager(object):
 
         if self.__config.has_option("rankings", "standard_k") is False:
             self.__config.set("rankings", "standard_k", 16)
+
+        if self.__config.has_option("rankings", "normalise_many_player_games") is False:
+            self.__config.set("rankings", "normalise_many_player_games", 1)
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
@@ -168,9 +175,11 @@ class Manager(object):
         for x in result:
             rating_changes.append(0)
 
-        # This divisor is used to make sure that the winner gets the same points as he would for just beating one
-        # person, even if they beat 10
-        divisor = len(result) - 1
+        divisor = 1
+        if self.__normalise_many_player_games is True:
+            # This divisor is used to make sure that the winner gets the same points as he would for just beating one
+            # person, even if they beat 10
+            divisor = len(result) - 1
 
         for i in range(0, len(result)):
             for j in range(i + 1, len(result)):
@@ -196,8 +205,7 @@ class Manager(object):
     def adjust_player_rating(self, player, adjustment, position, player_count):
         player.played_match = True
 
-        k = max((self.__config.getint("rankings", "initial_k") - player.match_count),
-                self.__config.getint("rankings", "standard_k"))
+        k = max((self.__initial_k - player.match_count), self.__standard_k)
 
         player.rating += k * adjustment
         player.match_count += 1
