@@ -4,6 +4,7 @@
 Manager.py: Manager for a rankings system based on chess rankings
 """
 
+from __future__ import division
 import json
 import os.path
 from ConfigParser import ConfigParser
