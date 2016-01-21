@@ -135,10 +135,6 @@ class Manager(object):
             player.active = active
             self.save()
 
-    @staticmethod
-    def remove_inactive(players):
-        return [x for x in players if x.active]
-
     def disable_player(self, player_id):
         if player_id in self.players:
             self.players[player_id].active = False

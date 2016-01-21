@@ -127,7 +127,7 @@ def match_mod():
 @app.route('/head_to_head')
 def head_to_heads():
     headings = []
-    players = get_players_in_name_order()
+    players = get_players_in_name_order(remove_never_played=True)
     player_ids = []
     for player in players:
         headings.append(player.short_name)
@@ -166,23 +166,37 @@ def head_to_heads():
     return html
 
 
-def get_players_in_rank_order(include_inactive=False):
+def remove_inactive_players(players):
+    return [x for x in players if x.active]
+
+
+def remove_no_game_players(players):
+    return [x for x in players if x.played_match]
+
+
+def get_players_in_rank_order(remove_inactive=True, remove_never_played=False):
     players = ranking_manager.players.values()
     players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
-    if include_inactive is True:
-        return players
-    else:
-        return Manager.remove_inactive(players)
+    if remove_inactive is True:
+        players = remove_inactive_players(players)
+
+    if remove_never_played is True:
+        players = remove_no_game_players(players)
+
+    return players
 
 
-def get_players_in_name_order(include_inactive=False):
+def get_players_in_name_order(remove_inactive=True, remove_never_played=False):
     players = ranking_manager.players.values()
     players.sort(key=lambda x: x.short_name.lower())
-    if include_inactive is True:
-        return players
-    else:
-        return Manager.remove_inactive(players)
 
+    if remove_inactive is True:
+        players = remove_inactive_players(players)
+
+    if remove_never_played is True:
+        players = remove_no_game_players(players)
+
+    return players
 
 @app.route('/<path:path>')
 def static_proxy(path):
