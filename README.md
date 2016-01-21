@@ -22,6 +22,7 @@ python __init__.py -n "Name of your league -s "Your sport"
 
 To edit configuration, run once then close. There will be a file called `config.txt` which can be edited.
 
+```
 [ui]
 league_title = # The name of the league
 sport = # The sport that the league is used for
@@ -32,3 +33,4 @@ port = 180 # What port to use for the website
 initial_k = 30  # The initial multiplier for ratings. Set high to bias towards early games (to get players established quickly)
 standard_k = 16 # The standard multiplier for ratings. How much is each game worth.
 normalise_many_player_games = 0 # 1 = Make winning a game against many players the same as a game against 1 player. 0 = many player games are lucrative.
+```
