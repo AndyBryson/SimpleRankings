@@ -222,7 +222,9 @@ class FlaskInterface(object):
             self.__config.write(configfile)
 
     def start(self):
-        start_flask(self.__config.get("ui", "host"), self.__config.getint("ui", "port"))
+        host = self.__config.get("ui", "host")
+        port = self.__config.getint("ui", "port")
+        start_flask(host, port)
         print("start")
 
 
