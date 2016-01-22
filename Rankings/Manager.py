@@ -133,7 +133,7 @@ class Manager(object):
     def set_name(self, player_id, name):
         player = self.get_player(player_id)
         if player is not None and name is not "":
-            player.name = name
+            player.set_name(name)
             self.save()
 
     def set_active(self, player_id, active):
