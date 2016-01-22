@@ -49,13 +49,13 @@ class Manager(object):
             self.__config.add_section("rankings")
 
         if self.__config.has_option("rankings", "initial_k") is False:
-            self.__config.set("rankings", "initial_k", 30)
+            self.__config.set("rankings", "initial_k", "30")
 
         if self.__config.has_option("rankings", "standard_k") is False:
-            self.__config.set("rankings", "standard_k", 16)
+            self.__config.set("rankings", "standard_k", "16")
 
         if self.__config.has_option("rankings", "normalise_many_player_games") is False:
-            self.__config.set("rankings", "normalise_many_player_games", 1)
+            self.__config.set("rankings", "normalise_many_player_games", "1")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)

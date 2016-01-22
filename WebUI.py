@@ -230,7 +230,7 @@ class FlaskInterface(object):
             self.__config.set("ui", "host", "0.0.0.0")
 
         if self.__config.has_option("ui", "port") is False:
-            self.__config.set("ui", "port", 180)
+            self.__config.set("ui", "port", "180")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
