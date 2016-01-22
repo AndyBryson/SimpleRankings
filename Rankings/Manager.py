@@ -39,7 +39,6 @@ class Manager(object):
 
         self.__initial_k = self.__config.getint("rankings", "initial_k")
         self.__standard_k = self.__config.getint("rankings", "standard_k")
-        self.__normalise_many_player_games = self.__config.getboolean("rankings", "normalise_many_player_games")
 
         if load:
             self.load()
@@ -53,9 +52,6 @@ class Manager(object):
 
         if self.__config.has_option("rankings", "standard_k") is False:
             self.__config.set("rankings", "standard_k", "16")
-
-        if self.__config.has_option("rankings", "normalise_many_player_games") is False:
-            self.__config.set("rankings", "normalise_many_player_games", "1")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
@@ -172,24 +168,26 @@ class Manager(object):
 
     def apply_points(self, result):
         rating_changes = []
+        normalised_rating_changes = []
         for x in result:
             rating_changes.append(0)
-
-        divisor = 1
-        if self.__normalise_many_player_games is True:
-            # This divisor is used to make sure that the winner gets the same points as he would for just beating one
-            # person, even if they beat 10
-            divisor = len(result) - 1
+            normalised_rating_changes.append(0)
 
         for i in range(0, len(result)):
             for j in range(i + 1, len(result)):
-                rating_change = Manager.calculate_rating_change(result[i], result[j]) / divisor
+                rating_change = Manager.calculate_rating_change(result[i], result[j])
+                normalised_rating_change = Manager.calculate_rating_change(result[i], result[j]) / (len(result) - 1)
                 rating_changes[i] += rating_change
                 rating_changes[j] -= rating_change
+                normalised_rating_changes[i] += normalised_rating_change
+                normalised_rating_changes[j] -= normalised_rating_change
 
         for i in range(0, len(result)):
             player = result[i]
             rating_change = rating_changes[i]
+            normalised_rating_change = normalised_rating_changes[i]
+
+            self.adjust_player_normalised_rating(player, normalised_rating_change)
             self.adjust_player_rating(player, rating_change, i+1, len(result))
 
     @staticmethod
@@ -217,6 +215,10 @@ class Manager(object):
 
         if position is 1:
             player.win_count += 1
+
+    def adjust_player_normalised_rating(self, player, adjustment):
+        k = max((self.__initial_k - player.match_count), self.__standard_k)
+        player.normalised_rating += k * adjustment
 
 
 if __name__ == "__main__":

@@ -28,6 +28,7 @@ class Player(object):
             self.set_name(name)
         self.active = active
         self.rating = rating
+        self.normalised_rating = rating
         self.played_match = False
         self.match_count = 0
         self.win_count = 0
@@ -38,26 +39,18 @@ class Player(object):
 
     def to_dict(self):
         return {"player_id": self.player_id,
-                "rating": self.rating,
                 "first_name": self.first_name,
                 "nick_name": self.nick_name,
                 "last_name": self.last_name,
-                "active": self.active,
-                "match_count": self.match_count,
-                "win_count": self.win_count,
-                "percent": self.percent}
+                "active": self.active}
 
     @staticmethod
     def from_dict(dict_in):
         p = Player()
         p.player_id = dict_in["player_id"]
-        p.rating = dict_in["rating"]
         if "name" in dict_in:
             p.set_name(dict_in["name"])
         p.active = dict_in["active"]
-        p.match_count = dict_in["match_count"]
-        p.win_count = dict_in["win_count"]
-        p.percent = dict_in["percent"]
         if "first_name" in dict_in:
             p.first_name = dict_in["first_name"].strip()
         if "nick_name" in dict_in:

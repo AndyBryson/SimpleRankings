@@ -25,7 +25,16 @@
                 <th>Played</th>
                 <th>Won</th>
                 <th>Ave pos %</th>
+                {% if show_normalised_rating %}
+                {% if not show_rating %}
                 <th>Rating</th>
+                {% else %}
+                <th>nRating</th>
+                {% endif %}
+                {% endif %}
+                {% if show_rating %}
+                <th>Rating</th>
+                {% endif %}
             </thead>
 
             <tbody>
@@ -36,7 +45,12 @@
                     <td>{{ player.match_count }}</td>
                     <td>{{ player.win_count }}</td>
                     <td>{{ player.percent|round(2) }}</td>
+                    {% if show_normalised_rating %}
+                    <td>{{ player.normalised_rating|round|int }}</td>
+                    {% endif %}
+                    {% if show_rating %}
                     <td>{{ player.rating|round|int }}</td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>

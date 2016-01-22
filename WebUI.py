@@ -39,11 +39,16 @@ def send_css(path):
 
 @app.route('/')
 def index():
+    sport = config.get("ui", "sport")
+    show_rating = config.getboolean("ui", "show_rating")
+    show_normalised_rating = config.getboolean("ui", "show_normalised_rating")
     html = render_template('index.html',
-                           sport=config.get("ui", "sport"),
+                           sport=sport,
                            league_title=config.get("ui", "league_title"),
                            ranking_manager=ranking_manager,
-                           players_by_rank=get_players_in_rank_order())
+                           players_by_rank=get_players_in_rank_order(),
+                           show_rating=show_rating,
+                           show_normalised_rating=show_normalised_rating)
     return html
 
 
@@ -176,7 +181,11 @@ def remove_no_game_players(players):
 
 def get_players_in_rank_order(remove_inactive=True, remove_never_played=False):
     players = ranking_manager.players.values()
-    players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
+    if config.getboolean("ui", "sort_by_normalised") is True:
+        players.sort(key=lambda x: (x.played_match, x.normalised_rating), reverse=True)
+    else:
+        players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
+
     if remove_inactive is True:
         players = remove_inactive_players(players)
 
@@ -231,6 +240,15 @@ class FlaskInterface(object):
 
         if self.__config.has_option("ui", "port") is False:
             self.__config.set("ui", "port", "180")
+
+        if self.__config.has_option("ui", "show_rating") is False:
+            self.__config.set("ui", "show_rating", "1")
+
+        if self.__config.has_option("ui", "show_normalised_rating") is False:
+            self.__config.set("ui", "show_normalised_rating", "0")
+
+        if self.__config.has_option("ui", "sort_by_normalised") is False:
+            self.__config.set("ui", "sort_by_normalised", "0")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
