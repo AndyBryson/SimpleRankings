@@ -23,8 +23,18 @@
                 <th style="width: 2em;"></th>
                 <th style="min-width: 8em;">Player</th>
                 <th>Played</th>
+                {% if show_wins %}
                 <th>Won</th>
+                {% endif %}
+                {% if show_draws %}
+                <th>Drawn</th>
+                {% endif %}
+                {% if show_losses %}
+                <th>Lost</th>
+                {% endif %}
+                {% if show_percent %}
                 <th>Ave pos %</th>
+                {% endif %}
                 {% if show_normalised_rating %}
                 {% if not show_rating %}
                 <th>Rating</th>
@@ -43,8 +53,18 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ player.long_name }}</td>
                     <td>{{ player.match_count }}</td>
+                    {% if show_wins %}
                     <td>{{ player.win_count }}</td>
+                    {% endif %}
+                    {% if show_draws %}
+                    <td>{{ player.draw_count }}</td>
+                    {% endif %}
+                    {% if show_losses %}
+                    <td>{{ player.loss_count }}</td>
+                    {% endif %}
+                    {% if show_percent %}
                     <td>{{ player.percent|round(2) }}</td>
+                    {% endif %}
                     {% if show_normalised_rating %}
                     <td>{{ player.normalised_rating|round|int }}</td>
                     {% endif %}

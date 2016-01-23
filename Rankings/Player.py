@@ -32,6 +32,8 @@ class Player(object):
         self.played_match = False
         self.match_count = 0
         self.win_count = 0
+        self.draw_count = 0
+        self.loss_count = 0
         self.percent = 0
 
     def total_matches(self):
@@ -109,6 +111,8 @@ class Player(object):
         self.played_match = False
         self.match_count = 0
         self.win_count = 0
+        self.draw_count = 0
+        self.loss_count = 0
         self.percent = 0
 
 

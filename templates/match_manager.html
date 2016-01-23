@@ -13,79 +13,28 @@
                     <th>
                         Player
                     </th>
+                    <th></th>
                 </thead>
                 <tbody>
+                    {% for i in range(1, max_players + 1) %}
                     <tr>
-                        <th>1st</th>
+                        <th>{{i}}</th>
                         <td>
-                            <select name="1st" style="width:20em;">
+                            <select name="{{i}}" style="width:20em;">
                                 <option value="" default selected>--select--</option>
                                 {% for player in players_by_name %}
                                     <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
+                            {% if support_draws and i == 1 %}
+                            <label for="draw">Match was a draw</label><input type="checkbox" id="draw" name="draw">
+                            {% endif %}
                         </td>
-                    </tr>
-
-                    <tr>
-                        <th>2nd</th>
                         <td>
-                            <select name="2nd" style="width:20em;">
-                                <option value="" default selected>--select--</option>
-                                {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <th>3rd</th>
-                        <td>
-                            <select name="3rd" style="width:20em;">
-                                <option value="" default selected>None</option>
-                                {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
-                                {% endfor %}
-                            </select>
                         </td>
                     </tr>
-
-                    <tr>
-                        <th>4th</th>
-                        <td>
-                            <select name="4th" style="width:20em;">
-                                <option value="" default selected>None</option>
-                                {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>5th</th>
-                        <td>
-                            <select name="5th" style="width:20em;">
-                                <option value="" default selected>None</option>
-                                {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>6th</th>
-                        <td>
-                            <select name="6th" style="width:20em;">
-                                <option value="" default selected>None</option>
-                                {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                    </tr>
+                    {% endfor %}
 
                 </tbody>
             </table>
@@ -107,6 +56,9 @@
                     <tr>
                         <td>{{ match.date }}</td>
                         <td style="min-width: 8em;">
+                            {% if match.draw %}
+                            DRAW:
+                            {% endif %}
                             {% for player_id in match.result_array %}
                                 {{ players_dict[player_id].short_name }},
                             {% endfor %}
