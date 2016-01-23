@@ -157,17 +157,20 @@ def head_to_heads():
             else:
                 count = 0
                 for match in ranking_manager.matches:
-                    i_found = False
-                    for player_id in match.result_array:
-                        if player_id is player_ids[i]:
-                            i_found = True
-                            continue
+                    if match.draw is True:
+                        count += 0.5
+                    else:
+                        i_found = False
+                        for player_id in match.result_array:
+                            if player_id is player_ids[i]:
+                                i_found = True
+                                continue
 
-                        if player_id is player_ids[j]:
-                            if i_found is True:
-                                count += 1
-                            else:
-                                break
+                            if player_id is player_ids[j]:
+                                if i_found is True:
+                                    count += 1
+                                else:
+                                    break
 
                 matrix[i][j] = count
 
