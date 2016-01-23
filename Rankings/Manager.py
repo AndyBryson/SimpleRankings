@@ -53,9 +53,6 @@ class Manager(object):
         if self.__config.has_option("rankings", "standard_k") is False:
             self.__config.set("rankings", "standard_k", "16")
 
-        if self.__config.has_option("rankings", "max_players") is False:
-            self.__config.set("rankings", "max_players", "6")
-
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
 
