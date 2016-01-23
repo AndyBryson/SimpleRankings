@@ -256,10 +256,10 @@ class FlaskInterface(object):
             self.__config.set("ui", "show_wins", "1")
 
         if self.__config.has_option("ui", "show_losses") is False:
-            self.__config.set("ui", "show_losses", "0")
+            self.__config.set("ui", "show_losses", "1")
 
         if self.__config.has_option("ui", "show_draws") is False:
-            self.__config.set("ui", "show_draws", "0")
+            self.__config.set("ui", "show_draws", "1")
 
         if self.__config.has_option("ui", "show_percent") is False:
             self.__config.set("ui", "show_percent", "1")
@@ -274,10 +274,10 @@ class FlaskInterface(object):
             self.__config.set("ui", "sort_by_normalised", "0")
 
         if self.__config.has_option("ui", "support_draws") is False:
-            self.__config.set("ui", "support_draws", "0")
+            self.__config.set("ui", "support_draws", "1")
 
         if self.__config.has_option("ui", "max_players_per_game") is False:
-            self.__config.set("ui", "max_players_per_game", "8")
+            self.__config.set("ui", "max_players_per_game", "2")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)

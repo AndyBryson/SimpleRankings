@@ -31,6 +31,12 @@ port = 180 # What port to use for the website
 show_rating = 1 # Show rating in the ratings table
 show_normalised_rating = 0 # Show normalised_rating in the ratings table (many player games worth the same as 2 player games
 sort_by_normalised = 0 # Sort by normalised_rating rather than standard rating
+support_draws = 1 # Set to 1 to allow draws
+show_wins = 1 # Show wins in the rating table
+show_losses = 1 # Show losses in the rating table
+show_draws = 1 # Show draws in the rating table
+show_percent = 1 # Show % in the rating table
+max_players_per_game = 2 # Max players per game
 
 [rankings]
 initial_k = 30  # The initial multiplier for ratings. Set high to bias towards early games (to get players established quickly)
