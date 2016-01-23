@@ -78,9 +78,10 @@ def report_result():
 
             if int(player) not in proper_results:
                 proper_results.append(int(player))
+        draw = request.form.get("draw")
 
         if len(proper_results) > 1:
-            ranking_manager.match(proper_results)
+            ranking_manager.match(proper_results, draw=draw)
 
     return match_manager()
 
