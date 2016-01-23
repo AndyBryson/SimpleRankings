@@ -105,6 +105,7 @@ class Player(object):
 
     def reset(self):
         self.rating = 1600
+        self.normalised_rating = 1600
         self.played_match = False
         self.match_count = 0
         self.win_count = 0
