@@ -13,6 +13,7 @@
                     <th>
                         Player
                     </th>
+                    <th></th>
                 </thead>
                 <tbody>
                     <tr>
@@ -24,6 +25,11 @@
                                     <option value="{{ player.player_id }}">{{ player.long_name }}</option>
                                 {% endfor %}
                             </select>
+                        </td>
+                        <td>
+                            {% if support_draws %}
+                            <label for="draw">Match was a draw</label><input type="checkbox" id="draw" name="draw">
+                            {% endif %}
                         </td>
                     </tr>
 
@@ -37,6 +43,7 @@
                                 {% endfor %}
                             </select>
                         </td>
+                        <td></td>
                     </tr>
 
                     <tr>
@@ -49,6 +56,7 @@
                                 {% endfor %}
                             </select>
                         </td>
+                        <td></td>
                     </tr>
 
                     <tr>
@@ -61,6 +69,7 @@
                                 {% endfor %}
                             </select>
                         </td>
+                        <td></td>
                     </tr>
 
                     <tr>
@@ -73,6 +82,7 @@
                                 {% endfor %}
                             </select>
                         </td>
+                        <td></td>
                     </tr>
 
                     <tr>
@@ -85,12 +95,12 @@
                                 {% endfor %}
                             </select>
                         </td>
+                        <td></td>
                     </tr>
 
                 </tbody>
             </table>
             <button type="submit" style="width:8em;">Report Result</button>
-            <input type="checkbox" id="draw" name="draw">
         </form>
     </div>
     <div id="match_manager" class="main_table">

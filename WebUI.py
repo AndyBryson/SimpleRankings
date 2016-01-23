@@ -121,6 +121,7 @@ def user_mod():
 def match_manager():
     html = render_template('match_manager.html',
                            sport=config.get("ui", "sport"),
+                           support_draws=config.get("ui", "support_draws"),
                            matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
                            league_title=config.get("ui", "league_title"),
@@ -273,7 +274,7 @@ class FlaskInterface(object):
         if self.__config.has_option("ui", "sort_by_normalised") is False:
             self.__config.set("ui", "sort_by_normalised", "0")
 
-        if self.__config.has_option("rankings", "support_draws") is False:
+        if self.__config.has_option("ui", "support_draws") is False:
             self.__config.set("ui", "support_draws", 0)
 
         with open(self.__config.file_name, 'wb') as configfile:
