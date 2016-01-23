@@ -104,7 +104,7 @@ class Manager(object):
         self.matches = []
 
         for match in matches:
-            self.match(match.result_array, match.date)
+            self.match(match.result_array, match.date, match.draw)
 
     def add_player(self, name, rating=1600):
         if name == "":
@@ -191,7 +191,7 @@ class Manager(object):
             normalised_rating_change = normalised_rating_changes[i]
 
             self.adjust_player_normalised_rating(player, normalised_rating_change)
-            self.adjust_player_rating(player, rating_change, i+1, len(result))
+            self.adjust_player_rating(player, rating_change, i+1, len(result), draw)
 
     @staticmethod
     def calculate_rating_change(winner, loser, draw):
@@ -206,21 +206,30 @@ class Manager(object):
     def get_exp_score_a(rating_a, rating_b):
         return 1.0 / (1 + 10**((rating_b - rating_a)/400.0))
 
-    def adjust_player_rating(self, player, adjustment, position, player_count):
+    def adjust_player_rating(self, player, adjustment, position, player_count, draw=False):
         player.played_match = True
 
         k = max((self.__initial_k - player.match_count), self.__standard_k)
 
         player.rating += k * adjustment
         player.match_count += 1
-        percent = ((player_count - position) / (player_count - 1)) * 100
+
+        if draw is True:
+            percent = 50
+        else:
+            percent = ((player_count - position) / (player_count - 1)) * 100
 
         percent_diff = (percent - player.percent) / player.match_count
 
         player.percent += percent_diff
 
-        if position is 1:
-            player.win_count += 1
+        if draw is True:
+            player.draw_count += 1
+        else:
+            if position is 1:
+                player.win_count += 1
+            elif position is player_count:
+                player.loss_count += 1
 
     def adjust_player_normalised_rating(self, player, adjustment):
         k = max((self.__initial_k - player.match_count), self.__standard_k)
