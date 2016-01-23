@@ -158,7 +158,7 @@ def head_to_heads():
             else:
                 count = 0
                 for match in ranking_manager.matches:
-                    if match.draw is True:
+                    if match.draw is True and i in match.result_array:
                         count += 0.5
                     else:
                         i_found = False
