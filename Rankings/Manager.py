@@ -53,6 +53,9 @@ class Manager(object):
         if self.__config.has_option("rankings", "standard_k") is False:
             self.__config.set("rankings", "standard_k", "16")
 
+        if self.__config.has_option("rankings", "max_players") is False:
+            self.__config.set("rankings", "max_players", "6")
+
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
 
@@ -148,7 +151,7 @@ class Manager(object):
             self.recalculate_rankings()
             self.save()
 
-    def match(self, players_in_order, date=None):
+    def match(self, players_in_order, date=None, draw=False):
         result = []
         for player in players_in_order:
             if type(player) is Player:
@@ -162,11 +165,11 @@ class Manager(object):
         for player in result:
             player_ids.append(player.player_id)
 
-        self.matches.append(Match(player_ids, date))
-        self.apply_points(result)
+        self.matches.append(Match(player_ids, date, draw))
+        self.apply_points(result, draw)
         self.save()
 
-    def apply_points(self, result):
+    def apply_points(self, result, draw=False):
         rating_changes = []
         normalised_rating_changes = []
         for x in result:
@@ -175,8 +178,8 @@ class Manager(object):
 
         for i in range(0, len(result)):
             for j in range(i + 1, len(result)):
-                rating_change = Manager.calculate_rating_change(result[i], result[j])
-                normalised_rating_change = Manager.calculate_rating_change(result[i], result[j]) / (len(result) - 1)
+                rating_change = Manager.calculate_rating_change(result[i], result[j], draw)
+                normalised_rating_change = Manager.calculate_rating_change(result[i], result[j], draw) / (len(result) - 1)
                 rating_changes[i] += rating_change
                 rating_changes[j] -= rating_change
                 normalised_rating_changes[i] += normalised_rating_change
@@ -191,9 +194,12 @@ class Manager(object):
             self.adjust_player_rating(player, rating_change, i+1, len(result))
 
     @staticmethod
-    def calculate_rating_change(winner, loser):
+    def calculate_rating_change(winner, loser, draw):
         exp_score_a = Manager.get_exp_score_a(winner.rating, loser.rating)
-        change = (1 - exp_score_a)
+        if draw is False:
+            change = (1 - exp_score_a)
+        else:
+            change = (0.5 - exp_score_a)
         return change
 
     @staticmethod

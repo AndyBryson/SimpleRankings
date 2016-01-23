@@ -250,6 +250,9 @@ class FlaskInterface(object):
         if self.__config.has_option("ui", "sort_by_normalised") is False:
             self.__config.set("ui", "sort_by_normalised", "0")
 
+        if self.__config.has_option("rankings", "support_draws") is False:
+            self.__config.set("ui", "support_draws", 0)
+
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
 
