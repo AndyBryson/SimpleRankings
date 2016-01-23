@@ -54,6 +54,7 @@ def index():
                            show_wins=show_wins,
                            show_draws=show_draws,
                            show_losses=show_losses,
+                           show_percent=show_percent,
                            show_rating=show_rating,
                            show_normalised_rating=show_normalised_rating)
     return html
@@ -71,12 +72,9 @@ def add_user():
 @app.route('/report_result', methods=["GET", "POST"])
 def report_result():
     if request.method == 'POST':
-        raw_results = [ request.form.get("1st"),
-                        request.form.get("2nd"),
-                        request.form.get("3rd"),
-                        request.form.get("4th"),
-                        request.form.get("5th"),
-                        request.form.get("6th") ]
+        raw_results = []
+        for i in range(1, config.getint("ui", "max_players_per_game") + 1):
+            raw_results.append(request.form.get(str(i)))
 
         proper_results = []
         for player in raw_results:
@@ -125,7 +123,8 @@ def match_manager():
                            matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
                            league_title=config.get("ui", "league_title"),
-                           players_by_name=get_players_in_name_order())
+                           players_by_name=get_players_in_name_order(),
+                           max_players=config.getint("ui", "max_players_per_game"))
     return html
 
 
@@ -275,7 +274,10 @@ class FlaskInterface(object):
             self.__config.set("ui", "sort_by_normalised", "0")
 
         if self.__config.has_option("ui", "support_draws") is False:
-            self.__config.set("ui", "support_draws", 0)
+            self.__config.set("ui", "support_draws", "0")
+
+        if self.__config.has_option("ui", "max_players_per_game") is False:
+            self.__config.set("ui", "max_players_per_game", "8")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
