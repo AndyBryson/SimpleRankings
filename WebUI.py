@@ -40,6 +40,10 @@ def send_css(path):
 @app.route('/')
 def index():
     sport = config.get("ui", "sport")
+    show_wins = config.getboolean("ui", "show_wins")
+    show_draws = config.getboolean("ui", "show_draws")
+    show_losses = config.getboolean("ui", "show_losses")
+    show_percent = config.getboolean("ui", "show_percent")
     show_rating = config.getboolean("ui", "show_rating")
     show_normalised_rating = config.getboolean("ui", "show_normalised_rating")
     html = render_template('index.html',
@@ -47,6 +51,9 @@ def index():
                            league_title=config.get("ui", "league_title"),
                            ranking_manager=ranking_manager,
                            players_by_rank=get_players_in_rank_order(),
+                           show_wins=show_wins,
+                           show_draws=show_draws,
+                           show_losses=show_losses,
                            show_rating=show_rating,
                            show_normalised_rating=show_normalised_rating)
     return html
@@ -78,7 +85,7 @@ def report_result():
 
             if int(player) not in proper_results:
                 proper_results.append(int(player))
-        draw = request.form.get("draw")
+        draw = request.form.get("draw") == "on"
 
         if len(proper_results) > 1:
             ranking_manager.match(proper_results, draw=draw)
@@ -241,6 +248,18 @@ class FlaskInterface(object):
 
         if self.__config.has_option("ui", "port") is False:
             self.__config.set("ui", "port", "180")
+
+        if self.__config.has_option("ui", "show_wins") is False:
+            self.__config.set("ui", "show_wins", "1")
+
+        if self.__config.has_option("ui", "show_losses") is False:
+            self.__config.set("ui", "show_losses", "0")
+
+        if self.__config.has_option("ui", "show_draws") is False:
+            self.__config.set("ui", "show_draws", "0")
+
+        if self.__config.has_option("ui", "show_percent") is False:
+            self.__config.set("ui", "show_percent", "1")
 
         if self.__config.has_option("ui", "show_rating") is False:
             self.__config.set("ui", "show_rating", "1")
