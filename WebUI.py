@@ -119,7 +119,7 @@ def user_mod():
 def match_manager():
     html = render_template('match_manager.html',
                            sport=config.get("ui", "sport"),
-                           support_draws=config.get("ui", "support_draws"),
+                           support_draws=config.getboolean("ui", "support_draws"),
                            matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
                            league_title=config.get("ui", "league_title"),
