@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-
-    {% block content %}
-        {% include 'header.html' %}
-    {% endblock %}
+{%- block content %}
+{% include 'header.html' %}
+{% endblock -%}
 <div id="wrapper">
     <style>
         #add_user_table{
@@ -11,10 +10,9 @@
     </style>
     <script>
         players = []
-        {% for player in players_by_name %}
+        {% for player in players_by_name -%}
             players.push( { name:'{{player.long_name | safe}}', active:{{player.active|lower}}, player_id:{{player.player_id}} })
         {% endfor %}
-
         function populate_user()
         {
             var user_select = document.getElementById("user")
@@ -80,7 +78,7 @@
                         <td>
                             <select name="user" id="user" onchange="populate_user()">
                                 <option value=-1 default selected>--select--</option>
-                                {% for player in players_by_name %}
+                                {% for player in players_by_name -%}
                                     <option value="{{ player.player_id }}">{{ player.short_name }}</option>
                                 {% endfor %}
                             </select>

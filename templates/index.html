@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-
-    {% block content %}
-        {% include 'header.html' %}
-    {% endblock %}
-
+{% block content %}
+{% include 'header.html' %}
+{% endblock %}
 <style>
     tr:nth-child(even){
         color:white;
@@ -20,59 +18,60 @@
     <div id="ranking_table" class="main_table">
         <table class="full-size">
             <thead>
-                <th style="width: 2em;"></th>
-                <th style="min-width: 8em;">Player</th>
-                <th>Played</th>
-                {% if show_wins %}
-                <th>Won</th>
-                {% endif %}
-                {% if show_draws %}
-                <th>Drawn</th>
-                {% endif %}
-                {% if show_losses %}
-                <th>Lost</th>
-                {% endif %}
-                {% if show_percent %}
-                <th>Ave pos %</th>
-                {% endif %}
-                {% if show_normalised_rating %}
-                {% if not show_rating %}
-                <th>Rating</th>
-                {% else %}
-                <th>nRating</th>
-                {% endif %}
-                {% endif %}
-                {% if show_rating %}
-                <th>Rating</th>
-                {% endif %}
+                <tr>
+                    <th style="width: 2em;"></th>
+                    <th style="min-width: 8em;">Player</th>
+                    <th>Played</th>
+                    {%- if show_wins %}
+                    <th>Won</th>
+                    {%- endif -%}
+                    {%- if show_draws %}
+                    <th>Drawn</th>
+                    {%- endif -%}
+                    {%- if show_losses %}
+                    <th>Lost</th>
+                    {%- endif -%}
+                    {%- if show_percent %}
+                    <th>Ave pos %</th>
+                    {% endif -%}
+                    {%- if show_normalised_rating %}
+                    {%- if not show_rating %}
+                    <th>Rating</th>
+                    {%- else -%}
+                    <th>nRating</th>
+                    {%- endif -%}
+                    {%- endif -%}
+                    {%- if show_rating -%}
+                    <th>Rating</th>
+                    {%- endif %}
+                </tr>
             </thead>
-
             <tbody>
-            {% for player in players_by_rank %}
+            {%- for player in players_by_rank %}
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>{{ player.long_name }}</td>
                     <td>{{ player.match_count }}</td>
-                    {% if show_wins %}
+                    {% if show_wins -%}
                     <td>{{ player.win_count }}</td>
-                    {% endif %}
-                    {% if show_draws %}
+                    {%- endif %}
+                    {% if show_draws -%}
                     <td>{{ player.draw_count }}</td>
-                    {% endif %}
-                    {% if show_losses %}
+                    {%- endif %}
+                    {% if show_losses -%}
                     <td>{{ player.loss_count }}</td>
-                    {% endif %}
-                    {% if show_percent %}
+                    {%- endif %}
+                    {% if show_percent -%}
                     <td>{{ player.percent|round(2) }}</td>
-                    {% endif %}
-                    {% if show_normalised_rating %}
+                    {%- endif %}
+                    {% if show_normalised_rating -%}
                     <td>{{ player.normalised_rating|round|int }}</td>
-                    {% endif %}
-                    {% if show_rating %}
+                    {%- endif %}
+                    {%- if show_rating -%}
                     <td>{{ player.rating|round|int }}</td>
-                    {% endif %}
+                    {%- endif %}
                 </tr>
-            {% endfor %}
+            {%- endfor %}
             </tbody>
         </table>
     </div>

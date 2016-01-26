@@ -1,8 +1,8 @@
 <!DOCTYPE html>
+{%- block content %}
+{% include 'header.html' %}
+{%- endblock %}
 
-    {% block content %}
-        {% include 'header.html' %}
-    {% endblock %}
 <div id="wrapper">
     <div id="match_report" class="main_table">
         <form action="{{ url_for('report_result') }}" method="POST">
@@ -16,26 +16,23 @@
                     <th></th>
                 </thead>
                 <tbody>
-                    {% for i in range(1, max_players + 1) %}
+                    {%- for i in range(1, max_players + 1) %}
                     <tr>
                         <th>{{i}}</th>
                         <td>
                             <select name="{{i}}" style="width:20em;">
                                 <option value="" default selected>--select--</option>
-                                {% for player in players_by_name %}
-                                    <option value="{{ player.player_id }}">{{ player.long_name }}</option>
-                                {% endfor %}
+                                {%- for player in players_by_name %}
+                                <option value="{{ player.player_id }}">{{ player.long_name }}</option>
+                                {%- endfor %}
                             </select>
-                            {% if support_draws and i == 1 %}
+                            {% if support_draws and i == 1 -%}
                             <label for="draw">Match was a draw</label><input type="checkbox" id="draw" name="draw">
-                            {% endif %}
+                            {%- endif -%}
                         </td>
-                        <td>
-
-                        </td>
+                        <td></td>
                     </tr>
-                    {% endfor %}
-
+                    {%- endfor -%}
                 </tbody>
             </table>
             <button type="submit" style="width:8em;">Report Result</button>
@@ -50,26 +47,26 @@
                 </tr>
             </thead>
             <tbody>
-                {% set index = matches|length - 1 %}
-                {% for match in matches %}
+                {% set index = matches|length - 1 -%}
+                {% for match in matches -%}
                 <form action="{{ url_for('match_mod') }}" method="POST">
                     <tr>
                         <td>{{ match.date }}</td>
                         <td style="min-width: 8em;">
-                            {% if match.draw %}
+                            {% if match.draw -%}
                             DRAW:
-                            {% endif %}
-                            {% for player_id in match.result_array %}
+                            {%- endif %}
+                            {%- for player_id in match.result_array -%}
                                 {{ players_dict[player_id].short_name }},
-                            {% endfor %}
+                            {%- endfor %}
                         </td>
                         <td>
                             <button type="submit" value={{ index }} name="match_to_delete">Delete</button>
                         </td>
                     </tr>
                 </form>
-                {% set index = index - 1 %}
-                {% endfor %}
+                {%- set index = index - 1 %}
+                {%- endfor %}
             </tbody>
         </table>
     </div>
