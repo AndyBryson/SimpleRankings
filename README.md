@@ -10,6 +10,8 @@ Install `python 2.7` and `flask`.
 
 ```pip install flask```
 
+If you want to use the TrueSkill algorithm, then `pip install trueskill`
+
 -
 
 #### Run
