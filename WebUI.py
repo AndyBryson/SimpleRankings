@@ -45,6 +45,10 @@ def index():
     show_losses = config.getboolean("ui", "show_losses")
     show_percent = config.getboolean("ui", "show_percent")
     show_rating = config.getboolean("ui", "show_rating")
+    show_true_skill_sigma = config.getboolean("ui", "show_true_skill_sigma") and \
+                            config.getboolean("rankings", "true_skill")
+    show_true_skill_mu = config.getboolean("ui", "show_true_skill_mu") and \
+                        config.getboolean("rankings", "true_skill")
     show_normalised_rating = config.getboolean("ui", "show_normalised_rating")
     html = render_template('index.html',
                            sport=sport,
@@ -56,7 +60,9 @@ def index():
                            show_losses=show_losses,
                            show_percent=show_percent,
                            show_rating=show_rating,
-                           show_normalised_rating=show_normalised_rating)
+                           show_normalised_rating=show_normalised_rating,
+                           show_true_skill_mu=show_true_skill_mu,
+                           show_true_skill_sigma=show_true_skill_sigma)
     return html
 
 
@@ -192,8 +198,11 @@ def remove_no_game_players(players):
 
 def get_players_in_rank_order(remove_inactive=True, remove_never_played=False):
     players = ranking_manager.players.values()
-    if config.getboolean("ui", "sort_by_normalised") is True:
+    sort_by = config.get("ui", "sort_by")
+    if sort_by.lower() == "nrating":
         players.sort(key=lambda x: (x.played_match, x.normalised_rating), reverse=True)
+    elif sort_by.lower() == "true_skill" and config.getboolean("rankings", "true_skill") is True:
+        players.sort(key=lambda x: (x.played_match, x.true_skill.mu), reverse=True)
     else:
         players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
 
@@ -270,8 +279,14 @@ class FlaskInterface(object):
         if self.__config.has_option("ui", "show_normalised_rating") is False:
             self.__config.set("ui", "show_normalised_rating", "0")
 
-        if self.__config.has_option("ui", "sort_by_normalised") is False:
-            self.__config.set("ui", "sort_by_normalised", "0")
+        if self.__config.has_option("ui", "sort_by") is False:
+            self.__config.set("ui", "sort_by", "rating")
+
+        if self.__config.has_option("ui", "show_true_skill_mu") is False:
+            self.__config.set("ui", "show_true_skill_mu", "0")
+
+        if self.__config.has_option("ui", "show_true_skill_sigma") is False:
+            self.__config.set("ui", "show_true_skill_sigma", "0")
 
         if self.__config.has_option("ui", "support_draws") is False:
             self.__config.set("ui", "support_draws", "1")

@@ -37,8 +37,12 @@ show_losses = 1 # Show losses in the rating table
 show_draws = 1 # Show draws in the rating table
 show_percent = 1 # Show % in the rating table
 max_players_per_game = 2 # Max players per game
+show_true_skill_mu = 0 # Show true_skill mu (rating) in the rating table
+show_true_skill_sigma = 0 # Show true_skill sigma (confidence level) in the rating table
+sort_by = rating # What to sort by. [rating, nRating, true_skill]
 
 [rankings]
 initial_k = 30  # The initial multiplier for ratings. Set high to bias towards early games (to get players established quickly)
 standard_k = 16 # The standard multiplier for ratings. How much is each game worth.
+true_skill = 0 # Use the true skill algorithm. Requires "pip install trueskill"
 ```

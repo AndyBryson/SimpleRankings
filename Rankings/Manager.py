@@ -39,6 +39,7 @@ class Manager(object):
 
         self.__initial_k = self.__config.getint("rankings", "initial_k")
         self.__standard_k = self.__config.getint("rankings", "standard_k")
+        self.__use_true_skill = self.__config.getboolean("rankings", "true_skill")
 
         if load:
             self.load()
@@ -52,6 +53,9 @@ class Manager(object):
 
         if self.__config.has_option("rankings", "standard_k") is False:
             self.__config.set("rankings", "standard_k", "16")
+
+        if self.__config.has_option("rankings", "true_skill") is False:
+            self.__config.set("rankings", "true_skill", "false")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
@@ -70,6 +74,9 @@ class Manager(object):
         for player in players_arr:
             player_obj = Player.from_dict(player)
             self.players[player_obj.player_id] = player_obj
+            if self.__use_true_skill is True:
+                from trueskill import Rating
+                player_obj.true_skill = Rating()
 
         for match in dict_in["matches"]:
             self.matches.append(Match.from_dict(match))
@@ -105,16 +112,18 @@ class Manager(object):
 
     def add_player(self, name, rating=1600):
         if name == "":
-            # TODO A: raise and handle an exception
             return -1
 
         for player in self.players.values():
             if player.long_name == name:
-                # TODO A: raise and handle an exception
                 return -1
 
         player_id = get_next_key(self.players)
         self.players[player_id] = Player(player_id, name, rating)
+
+        if self.__use_true_skill is True:
+            from trueskill import Rating
+            self.players[player_id].true_skill = Rating()
 
         self.save()
 
@@ -167,6 +176,21 @@ class Manager(object):
         self.save()
 
     def apply_points(self, result, draw=False):
+        if self.__use_true_skill is True:
+            from trueskill import rate
+            ts_result_list = []
+            ts_ranks = []
+            rank = 0
+            for p in result:
+                ts_result_list.append((p.true_skill,))
+                ts_ranks.append(rank)
+                if draw is False:
+                    rank += 1
+
+            ts_ratings = rate(ts_result_list, ranks=ts_ranks)
+            for i in range(0, len(result)):
+                result[i].true_skill = ts_ratings[i][0]
+
         rating_changes = []
         normalised_rating_changes = []
         for x in result:

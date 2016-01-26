@@ -34,6 +34,12 @@
                     {%- if show_percent %}
                     <th>Ave pos %</th>
                     {% endif -%}
+                    {%- if show_true_skill_mu %}
+                    <th>&mu;</th>
+                    {% endif -%}
+                    {%- if show_true_skill_sigma %}
+                    <th>&sigma;</th>
+                    {% endif -%}
                     {%- if show_normalised_rating %}
                     {%- if not show_rating %}
                     <th>Rating</th>
@@ -64,6 +70,12 @@
                     {% if show_percent -%}
                     <td>{{ player.percent|round(2) }}</td>
                     {%- endif %}
+                    {%- if show_true_skill_mu %}
+                    <td>{{player.true_skill.mu|round(1)}}</td>
+                    {% endif -%}
+                    {%- if show_true_skill_sigma %}
+                    <td>{{player.true_skill.sigma|round(1)}}</td>
+                    {% endif -%}
                     {% if show_normalised_rating -%}
                     <td>{{ player.normalised_rating|round|int }}</td>
                     {%- endif %}
