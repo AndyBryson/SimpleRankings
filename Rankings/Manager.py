@@ -103,6 +103,9 @@ class Manager(object):
     def recalculate_rankings(self):
         for player in self.players.values():
             player.reset()
+            if self.__use_true_skill is True:
+                from trueskill import Rating
+                player.true_skill = Rating()
 
         matches = self.matches
         self.matches = []

@@ -35,6 +35,7 @@ class Player(object):
         self.draw_count = 0
         self.loss_count = 0
         self.percent = 0
+        self.true_skill = None
 
     def total_matches(self):
         return self.match_count
@@ -114,6 +115,7 @@ class Player(object):
         self.draw_count = 0
         self.loss_count = 0
         self.percent = 0
+        self.true_skill = None
 
 
 
