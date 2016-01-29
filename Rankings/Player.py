@@ -80,6 +80,7 @@ class Player(object):
             if len(names) is 2:
                 self.first_name = names[0].strip()
                 self.last_name = names[1].strip()
+                self.nick_name = ""
             else:
                 self.first_name = name.strip()
                 self.nick_name = ""
