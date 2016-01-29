@@ -35,7 +35,11 @@
                     <th>Ave pos %</th>
                     {% endif -%}
                     {%- if show_true_skill_mu %}
+                    {%- if not show_rating and not show_normalised_rating %}
+                    <th>Rating</th>
+                    {% else %}
                     <th>Skill</th>
+                    {% endif %}
                     {% endif -%}
                     {%- if show_true_skill_sigma %}
                     <th>&sigma;</th>
