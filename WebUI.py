@@ -207,16 +207,25 @@ def head_to_heads():
                         count += 0.5
                     else:
                         i_found = False
-                        for player_id in match.result_array:
-                            if player_id is player_ids[i]:
-                                i_found = True
-                                continue
+                        team_game = False
+                        match_players = []
+                        for team in match.result_array:
+                            if len(team) > 1:
+                                team_game = True
+                                break
+                            match_players += team
 
-                            if player_id is player_ids[j]:
-                                if i_found is True:
-                                    count += 1
-                                else:
-                                    break
+                        if not team_game:
+                            for player_id in match_players:
+                                if player_id is player_ids[i]:
+                                    i_found = True
+                                    continue
+
+                                if player_id is player_ids[j]:
+                                    if i_found is True:
+                                        count += 1
+                                    else:
+                                        break
 
                 matrix[i][j] = count
 
