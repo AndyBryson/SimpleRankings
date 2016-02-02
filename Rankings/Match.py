@@ -26,12 +26,19 @@ class Match(object):
         self.draw = draw
 
     def to_dict(self):
-        return {"result_array": self.result_array, "date": self.date, "draw": self.draw}
+        return {"result_array": self.result_array,
+                "date": self.date,
+                "draw": self.draw}
 
     @staticmethod
     def from_dict(dict_in):
         m = Match()
         m.result_array = dict_in["result_array"]
+
+        for i in range(0, len(m.result_array)):  # we used to save as an array of individuals, not teams
+            if not isinstance(m.result_array[i], list):
+                m.result_array[i] = [ m.result_array[i] ]
+
         m.date = dict_in["date"]
         if "draw" in dict_in:
             m.draw = dict_in["draw"]

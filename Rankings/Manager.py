@@ -160,57 +160,102 @@ class Manager(object):
             self.recalculate_rankings()
             self.save()
 
-    def match(self, players_in_order, date=None, draw=False):
-        result = []
-        for player in players_in_order:
+    def clean_team(self, team):
+        clean_team = []
+        for player in team:
             if type(player) is Player:
-                result.append(player)
+                clean_team.append(player)
             elif type(player) is int:
-                result.append(self.get_player(player))
+                clean_team.append(self.get_player(player))
             else:
                 raise ValueError("winner must be a Player or a player_id", player)
+        return clean_team
+
+    def match(self, teams_in_order, date=None, draw=False):
+        result = []
+        for team in teams_in_order:
+            result.append(self.clean_team(team))
 
         player_ids = []
-        for player in result:
-            player_ids.append(player.player_id)
+        for team in result:
+            team_ids = []
+            for player in team:
+                team_ids.append(player.player_id)
+            player_ids.append(team_ids)
 
         self.matches.append(Match(player_ids, date, draw))
         self.apply_points(result, draw)
         self.save()
 
     def apply_points(self, result, draw=False):
+        number_of_teams = len(result)
+        for count, team in enumerate(result):
+            for player in team:
+                player.match_count += 1
+                if draw:
+                    player.draw_count += 1
+                elif count == 0:
+                    player.win_count += 1
+                elif count == number_of_teams - 1:
+                    player.loss_count += 1
+
+                if draw is True:
+                    percent = 50
+                else:
+                    percent = ((number_of_teams - (count + 1)) / (number_of_teams - 1)) * 100
+
+                percent_diff = (percent - player.percent) / player.match_count
+
+                player.percent += percent_diff
+
+
         if self.__use_true_skill is True:
             from trueskill import rate
             ts_result_list = []
             ts_ranks = []
             rank = 0
-            for p in result:
-                ts_result_list.append((p.true_skill,))
+
+            for team in result:
+                team_list = []
+                for player in team:
+                    team_list.append(player.true_skill)
+                team_tuple = tuple(team_list)
+                ts_result_list.append(team_tuple)
+
                 ts_ranks.append(rank)
                 if draw is False:
                     rank += 1
 
             ts_ratings = rate(ts_result_list, ranks=ts_ranks)
             for i in range(0, len(result)):
-                result[i].true_skill = ts_ratings[i][0]
+                for j in range(0, len(result[i])):
+                    result[i][j].true_skill = ts_ratings[i][j]
+
+        result_no_teams = []
+        for team in result:
+            if len(team) > 1:
+                return  # Only true skill supports teams
+            elif len(team) == 1:
+                result_no_teams.append(team[0])
 
         rating_changes = []
         normalised_rating_changes = []
-        for x in result:
+        for x in result_no_teams:
             rating_changes.append(0)
             normalised_rating_changes.append(0)
 
-        for i in range(0, len(result)):
-            for j in range(i + 1, len(result)):
-                rating_change = Manager.calculate_rating_change(result[i], result[j], draw)
-                normalised_rating_change = Manager.calculate_rating_change(result[i], result[j], draw) / (len(result) - 1)
+        for i in range(0, len(result_no_teams)):
+            for j in range(i + 1, len(result_no_teams)):
+                rating_change = Manager.calculate_rating_change(result_no_teams[i], result_no_teams[j], draw)
+                normalised_rating_change = Manager.calculate_rating_change(result_no_teams[i],
+                                                                           result_no_teams[j], draw) / (len(result_no_teams) - 1)
                 rating_changes[i] += rating_change
                 rating_changes[j] -= rating_change
                 normalised_rating_changes[i] += normalised_rating_change
                 normalised_rating_changes[j] -= normalised_rating_change
 
-        for i in range(0, len(result)):
-            player = result[i]
+        for i in range(0, len(result_no_teams)):
+            player = result_no_teams[i]
             rating_change = rating_changes[i]
             normalised_rating_change = normalised_rating_changes[i]
 
@@ -236,24 +281,7 @@ class Manager(object):
         k = max((self.__initial_k - player.match_count), self.__standard_k)
 
         player.rating += k * adjustment
-        player.match_count += 1
 
-        if draw is True:
-            percent = 50
-        else:
-            percent = ((player_count - position) / (player_count - 1)) * 100
-
-        percent_diff = (percent - player.percent) / player.match_count
-
-        player.percent += percent_diff
-
-        if draw is True:
-            player.draw_count += 1
-        else:
-            if position is 1:
-                player.win_count += 1
-            elif position is player_count:
-                player.loss_count += 1
 
     def adjust_player_normalised_rating(self, player, adjustment):
         k = max((self.__initial_k - player.match_count), self.__standard_k)

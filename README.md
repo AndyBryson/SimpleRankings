@@ -39,6 +39,8 @@ show_losses = 1 # Show losses in the rating table
 show_draws = 1 # Show draws in the rating table
 show_percent = 1 # Show % in the rating table
 max_players_per_game = 2 # Max players per game
+max_teams = 0 # Max teams. 0 = no team support, 4 is max
+support_individual = 1 # Set to 0 to disable individual results
 show_true_skill_mu = 0 # Show true_skill mu (rating) in the rating table
 show_true_skill_sigma = 0 # Show true_skill sigma (confidence level) in the rating table
 sort_by = rating # What to sort by. [rating, nRating, true_skill]

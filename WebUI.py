@@ -75,12 +75,49 @@ def add_user():
     return index()
 
 
-@app.route('/report_result', methods=["GET", "POST"])
-def report_result():
+@app.route('/report_team_result', methods=["GET", "POST"])
+def report_team_result():
+    if request.method == 'POST':
+        first = []
+        second = []
+        third = []
+        forth = []
+        for i in range(0, config.getint("ui", "max_players_per_game")):
+            i_first = request.form.get(str(i) + "_first")
+            if i_first != "":
+                first.append(int(i_first))
+                
+            i_second = request.form.get(str(i) + "_second")
+            if i_second != "":
+                second.append(int(i_second))
+                
+            i_third = request.form.get(str(i) + "_third")
+            if i_third != "":
+                third.append(int(i_third))
+                
+            i_forth = request.form.get(str(i) + "_forth")
+            if i_forth != "":
+                forth.append(int(i_forth))
+
+        draw = request.form.get("team_draw") == "on"
+
+        result = []
+        for array in [first, second, third, forth]:
+            if array:
+                result.append(array)
+
+        if len(result) > 1:
+            ranking_manager.match(result, draw=draw)
+
+    return match_manager()
+
+
+@app.route('/report_individual_result', methods=["GET", "POST"])
+def report_individual_result():
     if request.method == 'POST':
         raw_results = []
         for i in range(1, config.getint("ui", "max_players_per_game") + 1):
-            raw_results.append(request.form.get(str(i)))
+            raw_results.append([request.form.get(str(i))])
 
         proper_results = []
         for player in raw_results:
@@ -89,7 +126,8 @@ def report_result():
 
             if int(player) not in proper_results:
                 proper_results.append(int(player))
-        draw = request.form.get("draw") == "on"
+
+        draw = request.form.get("ind_draw") == "on"
 
         if len(proper_results) > 1:
             ranking_manager.match(proper_results, draw=draw)
@@ -130,7 +168,9 @@ def match_manager():
                            players_dict=ranking_manager.players,
                            league_title=config.get("ui", "league_title"),
                            players_by_name=get_players_in_name_order(),
-                           max_players=config.getint("ui", "max_players_per_game"))
+                           max_players=config.getint("ui", "max_players_per_game"),
+                           max_teams=config.getint("ui", "max_teams"),
+                           support_individual=config.getboolean("ui", "support_individual"))
     return html
 
 
@@ -227,6 +267,7 @@ def get_players_in_name_order(remove_inactive=True, remove_never_played=False):
 
     return players
 
+
 @app.route('/<path:path>')
 def static_proxy(path):
     # send_static_file will guess the correct MIME type
@@ -293,6 +334,12 @@ class FlaskInterface(object):
 
         if self.__config.has_option("ui", "max_players_per_game") is False:
             self.__config.set("ui", "max_players_per_game", "2")
+
+        if self.__config.has_option("ui", "max_teams") is False:
+            self.__config.set("ui", "max_teams", "0")
+
+        if self.__config.has_option("ui", "support_individual") is False:
+            self.__config.set("ui", "support_individual", "1")
 
         with open(self.__config.file_name, 'wb') as configfile:
             self.__config.write(configfile)
