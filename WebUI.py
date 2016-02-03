@@ -122,7 +122,7 @@ def report_individual_result():
     if request.method == 'POST':
         raw_results = []
         for i in range(1, config.getint("ui", "max_players_per_game") + 1):
-            raw_results.append([request.form.get(str(i))])
+            raw_results.append(request.form.get(str(i)))
 
         proper_results = []
         for player in raw_results:
@@ -130,7 +130,7 @@ def report_individual_result():
                 continue
 
             if int(player) not in proper_results:
-                proper_results.append(int(player))
+                proper_results.append([int(player)])
 
         draw = request.form.get("ind_draw") == "on"
 
