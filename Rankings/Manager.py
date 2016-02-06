@@ -208,7 +208,6 @@ class Manager(object):
 
                 player.percent += percent_diff
 
-
         if self.__use_true_skill is True:
             from trueskill import rate
             ts_result_list = []
@@ -248,7 +247,8 @@ class Manager(object):
             for j in range(i + 1, len(result_no_teams)):
                 rating_change = Manager.calculate_rating_change(result_no_teams[i], result_no_teams[j], draw)
                 normalised_rating_change = Manager.calculate_rating_change(result_no_teams[i],
-                                                                           result_no_teams[j], draw) / (len(result_no_teams) - 1)
+                                                                           result_no_teams[j],
+                                                                           draw) / (len(result_no_teams) - 1)
                 rating_changes[i] += rating_change
                 rating_changes[j] -= rating_change
                 normalised_rating_changes[i] += normalised_rating_change
@@ -282,32 +282,6 @@ class Manager(object):
 
         player.rating += k * adjustment
 
-
     def adjust_player_normalised_rating(self, player, adjustment):
         k = max((self.__initial_k - player.match_count), self.__standard_k)
         player.normalised_rating += k * adjustment
-
-
-if __name__ == "__main__":
-    m = Manager(False)
-    m.add_player("Andy")
-    m.add_player("Bob")
-    m.add_player("Test")
-    m.add_player("Dave")
-    m.match([0, 1, 2, 3])
-    m.match([3, 2, 1, 0])
-    m_string = m.to_json()
-
-    config = ConfigParser()
-    config.file_name = "config.txt"
-
-    other = Manager(config)
-    other.from_json(m_string)
-
-    print other.to_json()
-
-    players = m.get_players_in_rank_order()
-    total = 0
-    for player in players:
-        total += player.rating
-    print total / len(players)
