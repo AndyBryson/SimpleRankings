@@ -11,7 +11,8 @@
     <script>
         players = []
         {% for player in players_by_name -%}
-            players.push( { name:'{{player.long_name | safe}}', active:{{player.active|lower}}, player_id:{{player.player_id}} })
+            {%- set player_name = player.long_name | replace( "\'", "\\\'") | replace( "\"", "\\\"") | safe -%}
+            players.push({ name: '{{ player_name }}', active:{{player.active|lower}}, player_id:{{player.player_id}} })
         {% endfor %}
         function populate_user()
         {
