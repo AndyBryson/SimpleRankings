@@ -82,6 +82,9 @@ def report_team_result():
         second = []
         third = []
         forth = []
+
+        max_teams = config.getint("ui", "max_teams")
+
         for i in range(0, config.getint("ui", "max_players_per_game")):
             i_first = request.form.get(str(i) + "_first")
             if i_first != "":
@@ -90,14 +93,16 @@ def report_team_result():
             i_second = request.form.get(str(i) + "_second")
             if i_second != "":
                 second.append(int(i_second))
-                
-            i_third = request.form.get(str(i) + "_third")
-            if i_third != "":
-                third.append(int(i_third))
-                
-            i_forth = request.form.get(str(i) + "_forth")
-            if i_forth != "":
-                forth.append(int(i_forth))
+
+            if max_teams > 2:
+                i_third = request.form.get(str(i) + "_third")
+                if i_third != "":
+                    third.append(int(i_third))
+
+            if max_teams > 3:
+                i_forth = request.form.get(str(i) + "_forth")
+                if i_forth != "":
+                    forth.append(int(i_forth))
 
         draw = request.form.get("team_draw") == "on"
 
@@ -117,7 +122,7 @@ def report_individual_result():
     if request.method == 'POST':
         raw_results = []
         for i in range(1, config.getint("ui", "max_players_per_game") + 1):
-            raw_results.append([request.form.get(str(i))])
+            raw_results.append(request.form.get(str(i)))
 
         proper_results = []
         for player in raw_results:
@@ -125,7 +130,7 @@ def report_individual_result():
                 continue
 
             if int(player) not in proper_results:
-                proper_results.append(int(player))
+                proper_results.append([int(player)])
 
         draw = request.form.get("ind_draw") == "on"
 
