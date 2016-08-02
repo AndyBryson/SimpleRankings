@@ -17,7 +17,7 @@ If you want to use the TrueSkill algorithm, then `pip install trueskill`
 #### Run
 
 ```
-python __init__.py -n "Name of your league -s "Your sport"
+python __init__.py -n "Name of your league" -s "Your sport"
 ```
 
 #### In use
