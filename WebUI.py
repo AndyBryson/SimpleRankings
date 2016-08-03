@@ -290,7 +290,8 @@ def static_proxy(path):
 
 def start_flask(host, port):
     app.run(host=host,
-            port=port)
+            port=port,
+            threaded=True)
 
 
 ranking_manager = None
