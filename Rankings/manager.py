@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
 """
-Manager.py: Manager for a rankings system based on chess rankings
+manager.py: Manager for a rankings system based on chess rankings
 """
 
 from __future__ import division
 import json
 import os.path
-from ConfigParser import ConfigParser
+from trueskill import rate
 
-from Player import Player
-from Match import Match
+from .player import Player
+from .match import Match
+from Rankings.settings import Settings
 
 __author__ = "Andy Bryson"
 __copyright__ = "Copyright 2016, Andy Bryson"
@@ -30,35 +31,11 @@ def get_next_key(dict_in):
     return next_key
 
 
-class Manager(object):
-    def __init__(self, config, load=True):
+class Manager:
+    def __init__(self, config: Settings, load=True):
         self.players = {}
         self.matches = []
-        self.__config = config
-        self.__init_config()
-
-        self.__initial_k = self.__config.getint("rankings", "initial_k")
-        self.__standard_k = self.__config.getint("rankings", "standard_k")
-        self.__use_true_skill = self.__config.getboolean("rankings", "true_skill")
-
-        if load:
-            self.load()
-
-    def __init_config(self):
-        if self.__config.has_section("rankings") is False:
-            self.__config.add_section("rankings")
-
-        if self.__config.has_option("rankings", "initial_k") is False:
-            self.__config.set("rankings", "initial_k", "30")
-
-        if self.__config.has_option("rankings", "standard_k") is False:
-            self.__config.set("rankings", "standard_k", "16")
-
-        if self.__config.has_option("rankings", "true_skill") is False:
-            self.__config.set("rankings", "true_skill", "false")
-
-        with open(self.__config.file_name, 'wb') as configfile:
-            self.__config.write(configfile)
+        self.config = config
 
     def save(self):
         with open("data.txt", "w") as outfile:
@@ -74,7 +51,7 @@ class Manager(object):
         for player in players_arr:
             player_obj = Player.from_dict(player)
             self.players[player_obj.player_id] = player_obj
-            if self.__use_true_skill is True:
+            if self.config.use_true_skill is True:
                 from trueskill import Rating
                 player_obj.true_skill = Rating()
 
@@ -88,7 +65,7 @@ class Manager(object):
 
     def to_dict(self):
         players_arr = []
-        for key, player in self.players.iteritems():
+        for key, player in self.players.items():
             players_arr.append(player.to_dict())
 
         matches_arr = []
@@ -103,7 +80,7 @@ class Manager(object):
     def recalculate_rankings(self):
         for player in self.players.values():
             player.reset()
-            if self.__use_true_skill is True:
+            if self.config.use_true_skill is True:
                 from trueskill import Rating
                 player.true_skill = Rating()
 
@@ -124,7 +101,7 @@ class Manager(object):
         player_id = get_next_key(self.players)
         self.players[player_id] = Player(player_id, name, rating)
 
-        if self.__use_true_skill is True:
+        if self.config.use_true_skill is True:
             from trueskill import Rating
             self.players[player_id].true_skill = Rating()
 
@@ -208,8 +185,7 @@ class Manager(object):
 
                 player.percent += percent_diff
 
-        if self.__use_true_skill is True:
-            from trueskill import rate
+        if self.config.use_true_skill is True:
             ts_result_list = []
             ts_ranks = []
             rank = 0
@@ -278,10 +254,10 @@ class Manager(object):
     def adjust_player_rating(self, player, adjustment, position, player_count, draw=False):
         player.played_match = True
 
-        k = max((self.__initial_k - player.match_count), self.__standard_k)
+        k = max((self.config.initial_k - player.match_count), self.config.standard_k)
 
         player.rating += k * adjustment
 
     def adjust_player_normalised_rating(self, player, adjustment):
-        k = max((self.__initial_k - player.match_count), self.__standard_k)
+        k = max((self.config.initial_k - player.match_count), self.config.standard_k)
         player.normalised_rating += k * adjustment

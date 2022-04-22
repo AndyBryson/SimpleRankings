@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Match.py: A set of tools to run a rankings system based on chess rankings
+match.py: A set of tools to run a rankings system based on chess rankings
 """
 
 import time

@@ -6,8 +6,8 @@ WebUI.py: A web UI for a Rankings object
 
 import inspect
 import os
-from Rankings import Manager
-from ConfigParser import ConfigParser
+from Rankings.manager import Manager
+from Rankings.settings import Settings
 
 from flask import Flask, render_template, send_from_directory, request
 
@@ -22,8 +22,13 @@ __email__ = "agbryson@gmail.com"
 __status__ = "Development"
 
 
+settings = Settings()
+ranking_manager = Manager(settings)
+
+
 app = Flask(__name__
-            , static_folder=os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))), 'static')
+            , static_folder=os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))),
+                                         'static')
             , static_url_path='')
 
 
@@ -39,30 +44,19 @@ def send_css(path):
 
 @app.route('/')
 def index():
-    sport = config.get("ui", "sport")
-    show_wins = config.getboolean("ui", "show_wins")
-    show_draws = config.getboolean("ui", "show_draws")
-    show_losses = config.getboolean("ui", "show_losses")
-    show_percent = config.getboolean("ui", "show_percent")
-    show_rating = config.getboolean("ui", "show_rating")
-    show_true_skill_sigma = config.getboolean("ui", "show_true_skill_sigma") and \
-                            config.getboolean("rankings", "true_skill")
-    show_true_skill_mu = config.getboolean("ui", "show_true_skill_mu") and \
-                        config.getboolean("rankings", "true_skill")
-    show_normalised_rating = config.getboolean("ui", "show_normalised_rating")
     html = render_template('index.html',
-                           sport=sport,
-                           league_title=config.get("ui", "league_title"),
+                           sport=settings.sport,
+                           league_title=settings.league_title,
                            ranking_manager=ranking_manager,
                            players_by_rank=get_players_in_rank_order(),
-                           show_wins=show_wins,
-                           show_draws=show_draws,
-                           show_losses=show_losses,
-                           show_percent=show_percent,
-                           show_rating=show_rating,
-                           show_normalised_rating=show_normalised_rating,
-                           show_true_skill_mu=show_true_skill_mu,
-                           show_true_skill_sigma=show_true_skill_sigma)
+                           show_wins=settings.show_wins,
+                           show_draws=settings.show_draws,
+                           show_losses=settings.show_losses,
+                           show_percent=settings.show_percent,
+                           show_rating=settings.show_rating,
+                           show_normalised_rating=settings.show_normalised_rating,
+                           show_true_skill_mu=settings.show_true_skill_mu,
+                           show_true_skill_sigma=settings.show_true_skill_sigma)
     return html
 
 
@@ -70,7 +64,6 @@ def index():
 def add_user():
     if request.method == 'POST':
         new_player = request.form["add_name"]
-        print new_player
         ranking_manager.add_player(new_player)
     return index()
 
@@ -83,9 +76,9 @@ def report_team_result():
         third = []
         forth = []
 
-        max_teams = config.getint("ui", "max_teams")
+        max_teams = settings.max_teams
 
-        for i in range(0, config.getint("ui", "max_players_per_game")):
+        for i in range(settings.max_players_per_game):
             i_first = request.form.get(str(i) + "_first")
             if i_first != "":
                 first.append(int(i_first))
@@ -121,7 +114,7 @@ def report_team_result():
 def report_individual_result():
     if request.method == 'POST':
         raw_results = []
-        for i in range(1, config.getint("ui", "max_players_per_game") + 1):
+        for i in range(1, settings.max_players_per_game + 1):
             raw_results.append(request.form.get(str(i)))
 
         proper_results = []
@@ -143,9 +136,9 @@ def report_individual_result():
 @app.route('/user_manager')
 def user_manager():
     html = render_template('user_manager.html',
-                           sport=config.get("ui", "sport"),
+                           sport=settings.sport,
                            players_by_name=get_players_in_name_order(True),
-                           league_title=config.get("ui", "league_title"))
+                           league_title=settings.league_title)
     return html
 
 
@@ -167,15 +160,15 @@ def user_mod():
 @app.route('/match_manager')
 def match_manager():
     html = render_template('match_manager.html',
-                           sport=config.get("ui", "sport"),
-                           support_draws=config.getboolean("ui", "support_draws"),
+                           sport=settings.sport,
+                           support_draws=settings.support_draws,
                            matches=list(reversed(ranking_manager.matches)),
                            players_dict=ranking_manager.players,
-                           league_title=config.get("ui", "league_title"),
+                           league_title=settings.league_title,
                            players_by_name=get_players_in_name_order(),
-                           max_players=config.getint("ui", "max_players_per_game"),
-                           max_teams=config.getint("ui", "max_teams"),
-                           support_individual=config.getboolean("ui", "support_individual"))
+                           max_players=settings.max_players_per_game,
+                           max_teams=settings.max_teams,
+                           support_individual=settings.support_individual)
     return html
 
 
@@ -235,10 +228,10 @@ def head_to_heads():
                 matrix[i][j] = count
 
     html = render_template('head_to_head.html',
-                           sport=config.get("ui", "sport"),
+                           sport=settings.sport,
                            headings=headings,
                            matrix=matrix,
-                           league_title=config.get("ui", "league_title"))
+                           league_title=settings.league_title)
     return html
 
 
@@ -251,11 +244,11 @@ def remove_no_game_players(players):
 
 
 def get_players_in_rank_order(remove_inactive=True, remove_never_played=False):
-    players = ranking_manager.players.values()
-    sort_by = config.get("ui", "sort_by")
+    players = list(ranking_manager.players.values())
+    sort_by = settings.sort_by
     if sort_by.lower() == "nrating":
         players.sort(key=lambda x: (x.played_match, x.normalised_rating), reverse=True)
-    elif sort_by.lower() == "true_skill" and config.getboolean("rankings", "true_skill") is True:
+    elif sort_by.lower() == "true_skill" and settings.use_true_skill is True:
         players.sort(key=lambda x: (x.played_match, x.true_skill.mu), reverse=True)
     else:
         players.sort(key=lambda x: (x.played_match, x.rating), reverse=True)
@@ -270,7 +263,7 @@ def get_players_in_rank_order(remove_inactive=True, remove_never_played=False):
 
 
 def get_players_in_name_order(remove_inactive=True, remove_never_played=False):
-    players = ranking_manager.players.values()
+    players = list(ranking_manager.players.values())
     players.sort(key=lambda x: x.short_name.lower())
 
     if remove_inactive is True:
@@ -294,75 +287,6 @@ def start_flask(host, port):
             threaded=True)
 
 
-ranking_manager = None
-config = None
 
-
-class FlaskInterface(object):
-    def __init__(self, config_in, manager):
-        global ranking_manager
-        self.__config = config_in
-        self.init_config()
-        ranking_manager = manager
-        global config
-        config = config_in
-
-    def init_config(self):
-        if self.__config.has_section("ui") is False:
-            self.__config.add_section("ui")
-
-        if self.__config.has_option("ui", "host") is False:
-            self.__config.set("ui", "host", "0.0.0.0")
-
-        if self.__config.has_option("ui", "port") is False:
-            self.__config.set("ui", "port", "180")
-
-        if self.__config.has_option("ui", "show_wins") is False:
-            self.__config.set("ui", "show_wins", "1")
-
-        if self.__config.has_option("ui", "show_losses") is False:
-            self.__config.set("ui", "show_losses", "1")
-
-        if self.__config.has_option("ui", "show_draws") is False:
-            self.__config.set("ui", "show_draws", "1")
-
-        if self.__config.has_option("ui", "show_percent") is False:
-            self.__config.set("ui", "show_percent", "1")
-
-        if self.__config.has_option("ui", "show_rating") is False:
-            self.__config.set("ui", "show_rating", "1")
-
-        if self.__config.has_option("ui", "show_normalised_rating") is False:
-            self.__config.set("ui", "show_normalised_rating", "0")
-
-        if self.__config.has_option("ui", "sort_by") is False:
-            self.__config.set("ui", "sort_by", "rating")
-
-        if self.__config.has_option("ui", "show_true_skill_mu") is False:
-            self.__config.set("ui", "show_true_skill_mu", "0")
-
-        if self.__config.has_option("ui", "show_true_skill_sigma") is False:
-            self.__config.set("ui", "show_true_skill_sigma", "0")
-
-        if self.__config.has_option("ui", "support_draws") is False:
-            self.__config.set("ui", "support_draws", "1")
-
-        if self.__config.has_option("ui", "max_players_per_game") is False:
-            self.__config.set("ui", "max_players_per_game", "2")
-
-        if self.__config.has_option("ui", "max_teams") is False:
-            self.__config.set("ui", "max_teams", "0")
-
-        if self.__config.has_option("ui", "support_individual") is False:
-            self.__config.set("ui", "support_individual", "1")
-
-        with open(self.__config.file_name, 'wb') as configfile:
-            self.__config.write(configfile)
-
-    def start(self):
-        host = self.__config.get("ui", "host")
-        port = self.__config.getint("ui", "port")
-        start_flask(host, port)
-        print("start")
-
-
+if __name__ == '__main__':
+    start_flask(settings.host, settings.port)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Player.py: Information and helper methods for a player
+player.py: Information and helper methods for a player
 """
 
 from __future__ import division
@@ -16,7 +16,7 @@ __email__ = "agbryson@gmail.com"
 __status__ = "Development"
 
 
-class Player(object):
+class Player:
     def __init__(self, player_id=None, name=None, rating=1600, active=True):
         self.player_id = player_id
         self.first_name = ""
