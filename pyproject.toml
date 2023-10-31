@@ -1,0 +1,48 @@
+# NOTE: you have to use single-quoted strings in TOML for regular expressions.
+# It's the equivalent of r-strings in Python.  Multiline strings are treated as
+# verbose regular expressions by Black.  Use [ ] to denote a significant space
+# character.
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''
+
+[tool.ruff]
+line-length = 120
+ignore = ["F405", "B008"]
+select = ["E", "F", "B", "C4", "DTZ", "PTH", "TCH", "I001"]
+# unfixable = ["C4", "B"]
+exclude = ["docs/conf.py", "Deployment/make_deployment_bundle.py"]
+
+[tool.ruff.per-file-ignores]
+"**/__init__.py" = ["F401", "F403"]
+
+[tool.ruff.isort]
+split-on-trailing-comma = true
+known-third-party = ["pydantic", "fastapi", "aiohttp", "starlette_wtf", "wtforms", "starlette", "fastapi_pagination",
+                     "jinja2"]
+known-first-party = ["DataStore", "WindTriangle", "BATDataModels", "MongoBase", "PyRTZ"]
+no-lines-before = ["local-folder"]
+
+section-order = ["future","standard-library","third-party","first-party","this","local-folder"]
+
+[tool.ruff.isort.sections]
+"this" = ["Rankings"]

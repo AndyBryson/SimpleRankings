@@ -4,73 +4,63 @@
 WebUI.py: A web UI for a Rankings object
 """
 
-import inspect
-import os
+from pathlib import Path
+
+from flask import Flask, render_template, request, send_from_directory
+
 from Rankings.manager import Manager
 from Rankings.settings import Settings
-
-from flask import Flask, render_template, send_from_directory, request
-
-
-__author__ = "Andy Bryson"
-__copyright__ = "Copyright 2016, Andy Bryson"
-__credits__ = ["Andy Bryson"]
-__license__ = "GPLv3"
-__version__ = "0.0.1"
-__maintainer__ = "Andy Bryson"
-__email__ = "agbryson@gmail.com"
-__status__ = "Development"
-
 
 settings = Settings()
 ranking_manager = Manager(settings)
 
+static_directory = Path(__file__).parent / "static"
 
-app = Flask(__name__
-            , static_folder=os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))),
-                                         'static')
-            , static_url_path='')
+app = Flask(
+    __name__,
+    static_folder=static_directory,
+    static_url_path="",
+)
 
 
-@app.route('/images/<path:path>')
+@app.route("/images/<path:path>")
 def send_images(path):
-    return send_from_directory(os.path.join(app.static_folder, 'images'), path)
+    return send_from_directory(static_directory / "images", path)
 
 
-@app.route('/css/<path:path>')
+@app.route("/css/<path:path>")
 def send_css(path):
-    return send_from_directory(os.path.join(app.static_folder, 'css'), path)
+    return send_from_directory(static_directory / "css", path)
 
 
-@app.route('/')
+@app.route("/")
 def index():
-    html = render_template('index.html',
-                           sport=settings.sport,
-                           league_title=settings.league_title,
-                           ranking_manager=ranking_manager,
-                           players_by_rank=get_players_in_rank_order(),
-                           show_wins=settings.show_wins,
-                           show_draws=settings.show_draws,
-                           show_losses=settings.show_losses,
-                           show_percent=settings.show_percent,
-                           show_rating=settings.show_rating,
-                           show_normalised_rating=settings.show_normalised_rating,
-                           show_true_skill_mu=settings.show_true_skill_mu,
-                           show_true_skill_sigma=settings.show_true_skill_sigma)
+    html = render_template(
+        "index.html",
+        sport=settings.sport,
+        league_title=settings.league_title,
+        ranking_manager=ranking_manager,
+        players_by_rank=get_players_in_rank_order(),
+        show_wins=settings.show_wins,
+        show_draws=settings.show_draws,
+        show_losses=settings.show_losses,
+        show_percent=settings.show_percent,
+        show_rating=settings.show_rating,
+    )
     return html
 
 
-@app.route('/add_user', methods=["GET", "POST"])
+@app.route("/add_user", methods=["GET", "POST"])
 def add_user():
-    if request.method == 'POST':
+    if request.method == "POST":
         new_player = request.form["add_name"]
         ranking_manager.add_player(new_player)
     return index()
 
 
-@app.route('/report_team_result', methods=["GET", "POST"])
+@app.route("/report_team_result", methods=["GET", "POST"])
 def report_team_result():
-    if request.method == 'POST':
+    if request.method == "POST":
         first = []
         second = []
         third = []
@@ -82,7 +72,7 @@ def report_team_result():
             i_first = request.form.get(str(i) + "_first")
             if i_first != "":
                 first.append(int(i_first))
-                
+
             i_second = request.form.get(str(i) + "_second")
             if i_second != "":
                 second.append(int(i_second))
@@ -105,14 +95,14 @@ def report_team_result():
                 result.append(array)
 
         if len(result) > 1:
-            ranking_manager.match(result, draw=draw)
+            ranking_manager.add_match(result, draw=draw)
 
     return match_manager()
 
 
-@app.route('/report_individual_result', methods=["GET", "POST"])
+@app.route("/report_individual_result", methods=["GET", "POST"])
 def report_individual_result():
-    if request.method == 'POST':
+    if request.method == "POST":
         raw_results = []
         for i in range(1, settings.max_players_per_game + 1):
             raw_results.append(request.form.get(str(i)))
@@ -128,23 +118,25 @@ def report_individual_result():
         draw = request.form.get("ind_draw") == "on"
 
         if len(proper_results) > 1:
-            ranking_manager.match(proper_results, draw=draw)
+            ranking_manager.add_match(proper_results, draw=draw)
 
     return match_manager()
 
 
-@app.route('/user_manager')
+@app.route("/user_manager")
 def user_manager():
-    html = render_template('user_manager.html',
-                           sport=settings.sport,
-                           players_by_name=get_players_in_name_order(True),
-                           league_title=settings.league_title)
+    html = render_template(
+        "user_manager.html",
+        sport=settings.sport,
+        players_by_name=get_players_in_name_order(True),
+        league_title=settings.league_title,
+    )
     return html
 
 
-@app.route('/user_mod', methods=["GET", "POST"])
+@app.route("/user_mod", methods=["GET", "POST"])
 def user_mod():
-    if request.method == 'POST':
+    if request.method == "POST":
         user = request.form.get("user")
         name = request.form.get("name")
         active = request.form.get("active") == "on"
@@ -157,31 +149,33 @@ def user_mod():
     return user_manager()
 
 
-@app.route('/match_manager')
+@app.route("/match_manager")
 def match_manager():
-    html = render_template('match_manager.html',
-                           sport=settings.sport,
-                           support_draws=settings.support_draws,
-                           matches=list(reversed(ranking_manager.matches)),
-                           players_dict=ranking_manager.players,
-                           league_title=settings.league_title,
-                           players_by_name=get_players_in_name_order(),
-                           max_players=settings.max_players_per_game,
-                           max_teams=settings.max_teams,
-                           support_individual=settings.support_individual)
+    html = render_template(
+        "match_manager.html",
+        sport=settings.sport,
+        support_draws=settings.support_draws,
+        matches=list(reversed(ranking_manager.matches)),
+        players_dict=ranking_manager.players,
+        league_title=settings.league_title,
+        players_by_name=get_players_in_name_order(),
+        max_players=settings.max_players_per_game,
+        max_teams=settings.max_teams,
+        support_individual=settings.support_individual,
+    )
     return html
 
 
-@app.route('/match_mod', methods=["GET", "POST"])
+@app.route("/match_mod", methods=["GET", "POST"])
 def match_mod():
-    if request.method == 'POST':
+    if request.method == "POST":
         match_to_delete = request.form.get("match_to_delete")
         if match_to_delete != "":
             ranking_manager.delete_match(int(match_to_delete))
     return match_manager()
 
 
-@app.route('/head_to_head')
+@app.route("/head_to_head")
 def head_to_heads():
     headings = []
     players = get_players_in_name_order(remove_never_played=True)
@@ -227,11 +221,9 @@ def head_to_heads():
 
                 matrix[i][j] = count
 
-    html = render_template('head_to_head.html',
-                           sport=settings.sport,
-                           headings=headings,
-                           matrix=matrix,
-                           league_title=settings.league_title)
+    html = render_template(
+        "head_to_head.html", sport=settings.sport, headings=headings, matrix=matrix, league_title=settings.league_title
+    )
     return html
 
 
@@ -275,18 +267,15 @@ def get_players_in_name_order(remove_inactive=True, remove_never_played=False):
     return players
 
 
-@app.route('/<path:path>')
+@app.route("/<path:path>")
 def static_proxy(path):
     # send_static_file will guess the correct MIME type
     return app.send_static_file(path)
 
 
 def start_flask(host, port):
-    app.run(host=host,
-            port=port,
-            threaded=True)
+    app.run(host=host, port=port, threaded=True)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     start_flask(settings.host, settings.port)

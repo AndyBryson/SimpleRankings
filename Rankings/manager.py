@@ -1,263 +1,91 @@
-#!/usr/bin/env python
-
 """
 manager.py: Manager for a rankings system based on chess rankings
 """
 
-from __future__ import division
-import json
-import os.path
-from trueskill import rate
+from bson import ObjectId
 
-from .player import Player
-from .match import Match
-from Rankings.settings import Settings
-
-__author__ = "Andy Bryson"
-__copyright__ = "Copyright 2016, Andy Bryson"
-__credits__ = ["Andy Bryson"]
-__license__ = "GPLv3"
-__version__ = "0.0.1"
-__maintainer__ = "Andy Bryson"
-__email__ = "agbryson@gmail.com"
-__status__ = "Development"
-
-
-def get_next_key(dict_in):
-    next_key = 0
-    for key in dict_in.keys():
-        if key >= next_key:
-            next_key = key + 1
-    return next_key
+from .data_models import Match, Player
+from .settings import Settings
 
 
 class Manager:
-    def __init__(self, config: Settings, load=True):
-        self.players = {}
-        self.matches = []
+    def __init__(self, config: Settings):
+        self.players: dict[ObjectId, Player] = {}
+        self.matches: list[Match] = []
         self.config = config
-
-    def save(self):
-        with open("data.txt", "w") as outfile:
-            json.dump(self.to_json(), outfile, indent=2)
-
-    def load(self):
-        if os.path.isfile("data.txt"):
-            with open("data.txt", "r") as in_file:
-                self.from_json(json.load(in_file))
-
-    def from_dict(self, dict_in):
-        players_arr = dict_in["players"]
-        for player in players_arr:
-            player_obj = Player.from_dict(player)
-            self.players[player_obj.player_id] = player_obj
-            if self.config.use_true_skill is True:
-                from trueskill import Rating
-                player_obj.true_skill = Rating()
-
-        for match in dict_in["matches"]:
-            self.matches.append(Match.from_dict(match))
-
-        self.recalculate_rankings()
-
-    def from_json(self, json_in):
-        self.from_dict(json.loads(json_in))
-
-    def to_dict(self):
-        players_arr = []
-        for key, player in self.players.items():
-            players_arr.append(player.to_dict())
-
-        matches_arr = []
-        for match in self.matches:
-            matches_arr.append(match.to_dict())
-
-        return {"players": players_arr, "matches": matches_arr, }
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
 
     def recalculate_rankings(self):
         for player in self.players.values():
             player.reset()
-            if self.config.use_true_skill is True:
-                from trueskill import Rating
-                player.true_skill = Rating()
 
         matches = self.matches
         self.matches = []
 
         for match in matches:
-            self.match(match.result_array, match.date, match.draw)
+            self.add_match(match)
 
-    def add_player(self, name, rating=1600):
-        if name == "":
-            return -1
+    def add_player(self, player: Player):
+        _id = ObjectId()  # TODO: Add to a database
+        player._id = _id
+        self.players[player._id] = player
+        return player._id
 
-        for player in self.players.values():
-            if player.long_name == name:
-                return -1
+    def get_player(self, player_id: ObjectId):
+        return self.players[player_id]
 
-        player_id = get_next_key(self.players)
-        self.players[player_id] = Player(player_id, name, rating)
+    def set_active(self, player_id: ObjectId, active: bool):
+        player = self.players[player_id]
+        player.active = active
+        # TODO: Save to database
 
-        if self.config.use_true_skill is True:
-            from trueskill import Rating
-            self.players[player_id].true_skill = Rating()
+    def disable_player(self, player_id: ObjectId):
+        self.set_active(player_id, False)
 
-        self.save()
+    def delete_match(self, match_id: ObjectId):
+        if match_id not in self.matches:
+            raise KeyError(f"No such match: {match_id}")
+        self.recalculate_rankings()
+        # TODO: Save to database?
 
-        return player_id
+    def add_match(self, match: Match):
+        self.matches.append(match)
+        self._apply_points(match)
 
-    def get_player(self, player_id):
-        if player_id in self.players:
-            return self.players[player_id]
+    def _apply_points(self, match: Match):
+        assert len(match.result) == 2, "We need 2 people in a match"
+        rating_change = self.calculate_rating_change(match)
+
+        winner = self.players[match.result[0]]
+        loser = self.players[match.result[1]]
+
+        self.adjust_player_rating(player=loser, adjustment=rating_change)
+        self.adjust_player_rating(player=winner, adjustment=rating_change if match.draw else -rating_change)
+
+        if match.draw:
+            winner.draws += 1
+            loser.draws += 1
         else:
-            return None
+            winner.wins += 1
+            loser.losses += 1
 
-    def set_name(self, player_id, name):
-        player = self.get_player(player_id)
-        if player is not None and name is not "":
-            player.set_name(name)
-            self.save()
+        # TODO: Save to the database
 
-    def set_active(self, player_id, active):
-        player = self.get_player(player_id)
-        if player is not None:
-            player.active = active
-            self.save()
-
-    def disable_player(self, player_id):
-        if player_id in self.players:
-            self.players[player_id].active = False
-
-    def delete_match(self, match_index):
-        if match_index < len(self.matches):
-            self.matches.pop(match_index)
-            self.recalculate_rankings()
-            self.save()
-
-    def clean_team(self, team):
-        clean_team = []
-        for player in team:
-            if type(player) is Player:
-                clean_team.append(player)
-            elif type(player) is int:
-                clean_team.append(self.get_player(player))
-            else:
-                raise ValueError("winner must be a Player or a player_id", player)
-        return clean_team
-
-    def match(self, teams_in_order, date=None, draw=False):
-        result = []
-        for team in teams_in_order:
-            result.append(self.clean_team(team))
-
-        player_ids = []
-        for team in result:
-            team_ids = []
-            for player in team:
-                team_ids.append(player.player_id)
-            player_ids.append(team_ids)
-
-        self.matches.append(Match(player_ids, date, draw))
-        self.apply_points(result, draw)
-        self.save()
-
-    def apply_points(self, result, draw=False):
-        number_of_teams = len(result)
-        for count, team in enumerate(result):
-            for player in team:
-                player.match_count += 1
-                if draw:
-                    player.draw_count += 1
-                elif count == 0:
-                    player.win_count += 1
-                elif count == number_of_teams - 1:
-                    player.loss_count += 1
-
-                if draw is True:
-                    percent = 50
-                else:
-                    percent = ((number_of_teams - (count + 1)) / (number_of_teams - 1)) * 100
-
-                percent_diff = (percent - player.percent) / player.match_count
-
-                player.percent += percent_diff
-
-        if self.config.use_true_skill is True:
-            ts_result_list = []
-            ts_ranks = []
-            rank = 0
-
-            for team in result:
-                team_list = []
-                for player in team:
-                    team_list.append(player.true_skill)
-                team_tuple = tuple(team_list)
-                ts_result_list.append(team_tuple)
-
-                ts_ranks.append(rank)
-                if draw is False:
-                    rank += 1
-
-            ts_ratings = rate(ts_result_list, ranks=ts_ranks)
-            for i in range(0, len(result)):
-                for j in range(0, len(result[i])):
-                    result[i][j].true_skill = ts_ratings[i][j]
-
-        result_no_teams = []
-        for team in result:
-            if len(team) > 1:
-                return  # Only true skill supports teams
-            elif len(team) == 1:
-                result_no_teams.append(team[0])
-
-        rating_changes = []
-        normalised_rating_changes = []
-        for x in result_no_teams:
-            rating_changes.append(0)
-            normalised_rating_changes.append(0)
-
-        for i in range(0, len(result_no_teams)):
-            for j in range(i + 1, len(result_no_teams)):
-                rating_change = Manager.calculate_rating_change(result_no_teams[i], result_no_teams[j], draw)
-                normalised_rating_change = Manager.calculate_rating_change(result_no_teams[i],
-                                                                           result_no_teams[j],
-                                                                           draw) / (len(result_no_teams) - 1)
-                rating_changes[i] += rating_change
-                rating_changes[j] -= rating_change
-                normalised_rating_changes[i] += normalised_rating_change
-                normalised_rating_changes[j] -= normalised_rating_change
-
-        for i in range(0, len(result_no_teams)):
-            player = result_no_teams[i]
-            rating_change = rating_changes[i]
-            normalised_rating_change = normalised_rating_changes[i]
-
-            self.adjust_player_normalised_rating(player, normalised_rating_change)
-            self.adjust_player_rating(player, rating_change, i+1, len(result), draw)
+    def calculate_rating_change(self, match: Match):
+        ratings = [self.players[player_id].rating for player_id in match.result]
+        assert len(ratings) == 2, "We only support matches between 2 players"
+        exp_score_a = Manager.get_exp_score_a(*ratings)
+        if match.draw:
+            return 0.5 - exp_score_a
+        else:
+            return 1 - exp_score_a
 
     @staticmethod
-    def calculate_rating_change(winner, loser, draw):
-        exp_score_a = Manager.get_exp_score_a(winner.rating, loser.rating)
-        if draw is False:
-            change = (1 - exp_score_a)
-        else:
-            change = (0.5 - exp_score_a)
-        return change
+    def get_exp_score_a(rating_a: float, rating_b: float) -> float:
+        return 1.0 / (1 + 10 ** ((rating_b - rating_a) / 400.0))
 
-    @staticmethod
-    def get_exp_score_a(rating_a, rating_b):
-        return 1.0 / (1 + 10**((rating_b - rating_a)/400.0))
-
-    def adjust_player_rating(self, player, adjustment, position, player_count, draw=False):
+    def adjust_player_rating(self, player: Player, adjustment: float):
         player.played_match = True
 
         k = max((self.config.initial_k - player.match_count), self.config.standard_k)
 
         player.rating += k * adjustment
-
-    def adjust_player_normalised_rating(self, player, adjustment):
-        k = max((self.config.initial_k - player.match_count), self.config.standard_k)
-        player.normalised_rating += k * adjustment
