@@ -7,18 +7,17 @@ match.py: A set of tools to run a rankings system based on chess rankings
 from datetime import datetime
 
 from bson import ObjectId
-from pydantic import BaseModel
+
+from .mongo_pure_pydantic import MongoPurePydantic
 
 
-class Match(BaseModel):
-    _id: ObjectId | None = None
+class Match(MongoPurePydantic):
     result: list[ObjectId]
     draw: bool
     date: datetime
 
 
-class Player(BaseModel):
-    _id: ObjectId | None = None
+class Player(MongoPurePydantic):
     first_name: str = ""
     last_name: str = ""
     active: bool = True
