@@ -7,17 +7,33 @@ match.py: A set of tools to run a rankings system based on chess rankings
 from datetime import datetime
 
 from bson import ObjectId
+from pydantic import BaseModel
 
 from .mongo_pure_pydantic import MongoPurePydantic
 
+__all__ = ["Match", "MatchDatabase", "PlayerDatabase", "Player"]
 
-class Match(MongoPurePydantic):
-    result: list[ObjectId]
+
+class Match(BaseModel):
+    id: str | None = None
+    result: list[str]
     draw: bool
     date: datetime
 
 
-class Player(MongoPurePydantic):
+class MatchDatabase(Match, MongoPurePydantic):
+    __meta__ = {"collection": "matches"}
+    result: list[ObjectId]
+
+    def to_match(self) -> Match:
+        d = self.dict()
+        d["id"] = str(self.id)
+        d["result"] = [str(x) for x in self.result]
+        return Match(**d)
+
+
+class Player(BaseModel):
+    id: str | None = None
     first_name: str = ""
     last_name: str = ""
     active: bool = True
@@ -31,3 +47,12 @@ class Player(MongoPurePydantic):
     def reset(self):
         self.rating = 1600
         self.normalised_rating = 1600
+
+
+class PlayerDatabase(MongoPurePydantic, Player):
+    __meta__ = {"collection": "players"}
+
+    def to_player(self) -> Player:
+        d = self.dict()
+        d["id"] = str(self.id)
+        return Player(**d)
