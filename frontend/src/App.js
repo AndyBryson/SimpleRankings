@@ -8,11 +8,11 @@ function App() {
     const [players, setPlayers] = useState([]);
 
     function update_players() {
-        getPlayers().then(players => setPlayers(players));
+        return getPlayers().then(players => setPlayers(players));
     }
 
     useEffect(() => {
-        if (!players.length) {
+        if (players.length < 1) {
             update_players();
         }
     });

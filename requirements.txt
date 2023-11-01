@@ -3,3 +3,7 @@ fastapi
 pymongo
 click
 uvicorn
+loguru
+motor
+mongomock_motor
+MongoBase

@@ -1,5 +1,7 @@
 from pydantic import BaseSettings
 
+from MongoBase import MongoConfig, MongoConfigStandard
+
 __all__ = ["Settings"]
 
 
@@ -11,9 +13,6 @@ class Settings(BaseSettings):
     show_percent: bool = True
     show_rating: bool = True
     support_draws: bool = False
-    max_players_per_game: int = 2
-
-    league_title: str = "BAR Technologies Billiards Society"
 
     initial_k: float = 30
     standard_k: float = 16
@@ -24,5 +23,4 @@ class Settings(BaseSettings):
 
     backend_cors_origins: list[str] = ["*"]
 
-    mongo_host: str = "localhost"
-    mongo_port: int = 27017
+    mongo: MongoConfig = MongoConfigStandard(username="pool", password="PoolLeague", database="pool_league")

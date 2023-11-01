@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from pydantic import BaseModel, validator
 
-from .mongo_pure_pydantic import MongoPurePydantic
+from Rankings.Mongo import MongoPurePydantic
 
 __all__ = ["Match", "MatchDatabase", "PlayerDatabase", "Player"]
 

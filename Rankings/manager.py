@@ -5,6 +5,7 @@ import copy
 
 from bson import ObjectId
 
+import Rankings.Mongo.motor as motor
 from .data_models import Match, MatchDatabase, Player, PlayerDatabase
 from .settings import Settings
 
@@ -13,61 +14,67 @@ __all__ = ["Manager"]
 
 class Manager:
     def __init__(self, config: Settings):
-        self.__players: dict[ObjectId, PlayerDatabase] = {}
-        self.__matches: list[MatchDatabase] = []
+        # self.__players: dict[ObjectId, PlayerDatabase] = {}
+        # self.__matches: list[MatchDatabase] = []
         self._config = config
+        self._motor_client = motor.connect(config.mongo)
 
-    def get_players(self) -> dict[ObjectId, PlayerDatabase]:
-        return copy.deepcopy(self.__players)
+    async def get_players(self) -> dict[ObjectId, PlayerDatabase]:
+        player_list = await motor.find(PlayerDatabase).to_list(None)
+        players = {player.id: player for player in player_list}
+        return players
 
-    def get_matches(self) -> list[MatchDatabase]:
-        return copy.deepcopy(self.__matches)
+    async def get_matches(self) -> list[MatchDatabase]:
+        matches = await motor.find(MatchDatabase).to_list(None)
+        return copy.deepcopy(matches)
 
-    def recalculate_rankings(self):
-        for player in self.__players.values():
+    async def recalculate_rankings(self):
+        players = await self.get_players()
+        for player in players.values():
             player.reset()
 
-        matches = self.__matches
-        self.__matches = []
+        matches = await self.get_matches()
+
+        await motor.delete_many(MatchDatabase)
 
         for match in matches:
             self.add_match(match)
 
-    def add_player(self, player: Player) -> PlayerDatabase:
-        _id = ObjectId()  # TODO: Add to a database
+        for player in players.values():
+            await motor.update_one(player)
+
+    async def add_player(self, player: Player) -> PlayerDatabase:
         db_player = PlayerDatabase(**player.dict())
-        db_player.id = _id
-        self.__players[_id] = db_player
+        await motor.insert_one(db_player)
         return db_player
 
-    def update_player(self, player: Player) -> Player:
+    async def update_player(self, player: Player) -> PlayerDatabase:
         _id = ObjectId(player.id)
-        db_player = self.__players[_id]
+        existing_player = await self.get_player(_id)
+
         for key, value in player.dict():
             if key != "id":
-                setattr(db_player, key, value)
-        # TODO: save
-        return player
+                setattr(existing_player, key, value)
 
-    def get_player(self, player_id: ObjectId):
-        return self.__players[player_id]
+        await motor.update_one(existing_player)
+        return existing_player
 
-    def set_active(self, player_id: ObjectId, active: bool):
-        player = self.__players[player_id]
+    async def get_player(self, player_id: ObjectId) -> PlayerDatabase:
+        return await motor.get_from_id(PlayerDatabase, id=player_id)
+
+    async def set_active(self, player_id: ObjectId, active: bool):
+        player = await self.get_player(player_id)
         player.active = active
-        # TODO: Save to database
+        await motor.update_one(player)
 
-    def delete_match(self, match_id: ObjectId):
-        if match_id not in self.__matches:
-            raise KeyError(f"No such match: {match_id}")
-        self.recalculate_rankings()
-        # TODO: Save to database?
+    async def delete_match(self, match_id: ObjectId):
+        match = await self.get_match(match_id)
+        await motor.delete_one(match)
+        await self.recalculate_rankings()
 
-    def add_match(self, match: Match) -> MatchDatabase:
+    async def add_match(self, match: Match) -> MatchDatabase:
         db_match = MatchDatabase.from_match(match)
-        db_match.id = ObjectId()
-        # TODO: Save to database
-        self.__matches.append(db_match)
+        await motor.insert_one(db_match)
         self._apply_points(db_match)
         return db_match
 
@@ -107,4 +114,3 @@ class Manager:
         k = max((self._config.initial_k - player.match_count), self._config.standard_k)
 
         player.rating += k * adjustment
-        # TODO: Save to database
