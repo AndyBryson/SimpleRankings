@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta, timezone
+
 import click
 import uvicorn
 
 from Rankings.api import build_api
+from Rankings.data_models import Match, Player
 from Rankings.manager import Manager
 from Rankings.settings import Settings
 
@@ -9,9 +12,25 @@ from Rankings.settings import Settings
 @click.command()
 @click.option("--host", default="0.0.0.0")
 @click.option("--port", default=8080)
-def main(host: str, port: int):
+@click.option("--debug", is_flag=True)
+def main(host: str, port: int, debug: bool):
     settings = Settings()  # TODO: load these
     manager = Manager(config=settings)
+
+    if debug:
+        alice = manager.add_player(Player(first_name="Alice", last_name="Smith"))
+        bob = manager.add_player(Player(first_name="Bob", last_name="Jones"))
+        charlie = manager.add_player(Player(first_name="Charlie", last_name="Brown"))
+        charlie_id = str(charlie.id)
+        bob_id = str(bob.id)
+        alice_id = str(alice.id)
+        manager.add_match(
+            Match(result=[alice_id, bob_id], draw=False, date=datetime.now(tz=timezone.utc) - timedelta(hours=1))
+        )
+        manager.add_match(
+            Match(result=[bob_id, charlie_id], draw=False, date=datetime.now(tz=timezone.utc) - timedelta(hours=2))
+        )
+
     api = build_api(manager=manager)
 
     uvicorn.run(api, host=host, port=port)

@@ -8,6 +8,8 @@ from bson import ObjectId
 from .data_models import Match, MatchDatabase, Player, PlayerDatabase
 from .settings import Settings
 
+__all__ = ["Manager"]
+
 
 class Manager:
     def __init__(self, config: Settings):
@@ -62,7 +64,9 @@ class Manager:
         # TODO: Save to database?
 
     def add_match(self, match: Match) -> Match:
-        db_match = MatchDatabase(**match.dict())
+        db_match = MatchDatabase.from_match(match)
+        db_match.id = ObjectId()
+        # TODO: Save to database
         self.__matches.append(db_match)
         self._apply_points(db_match)
         return match
@@ -74,8 +78,8 @@ class Manager:
         winner = self.__players[match.result[0]]
         loser = self.__players[match.result[1]]
 
-        self.adjust_player_rating(player=loser, adjustment=rating_change)
-        self.adjust_player_rating(player=winner, adjustment=rating_change if match.draw else -rating_change)
+        self.adjust_player_rating(player=winner, adjustment=rating_change)
+        self.adjust_player_rating(player=loser, adjustment=rating_change if match.draw else -rating_change)
 
         if match.draw:
             winner.draws += 1
@@ -89,19 +93,18 @@ class Manager:
     def calculate_rating_change(self, match: MatchDatabase):
         ratings = [self.__players[player_id].rating for player_id in match.result]
         assert len(ratings) == 2, "We only support __matches between 2 __players"
-        exp_score_a = Manager.get_exp_score_a(*ratings)
+        expected_score = Manager.expected_score(*ratings)
         if match.draw:
-            return 0.5 - exp_score_a
+            return 0.5 - expected_score
         else:
-            return 1 - exp_score_a
+            return 1 - expected_score
 
     @staticmethod
-    def get_exp_score_a(rating_a: float, rating_b: float) -> float:
+    def expected_score(rating_a: float, rating_b: float) -> float:
         return 1.0 / (1 + 10 ** ((rating_b - rating_a) / 400.0))
 
     def adjust_player_rating(self, player: Player, adjustment: float):
-        player.played_match = True
-
         k = max((self._config.initial_k - player.match_count), self._config.standard_k)
 
         player.rating += k * adjustment
+        # TODO: Save to database

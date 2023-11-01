@@ -38,7 +38,8 @@ def build_api(manager: Manager) -> FastAPI:
     @api.get("/matches", response_model=list[Match])
     def get_matches():
         matches = manager.get_matches()
-        return matches
+        ret = [x.to_match() for x in matches]
+        return ret
 
     @api.post("/matches")
     def add_match(match: Match):

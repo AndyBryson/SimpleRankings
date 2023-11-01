@@ -31,6 +31,14 @@ class MatchDatabase(Match, MongoPurePydantic):
         d["result"] = [str(x) for x in self.result]
         return Match(**d)
 
+    @classmethod
+    def from_match(cls, match: Match):
+        d = match.dict()
+        if _id := d.get("id"):
+            d["id"] = ObjectId(_id)
+        d["result"] = [ObjectId(x) for x in d["result"] if isinstance(x, str)]
+        return cls(**d)
+
 
 class Player(BaseModel):
     id: str | None = None
@@ -38,7 +46,6 @@ class Player(BaseModel):
     last_name: str = ""
     active: bool = True
     rating: float = 1600
-    normalised_rating: float = 1600
     match_count: int = 0
     wins: int = 0
     losses: int = 0
@@ -46,7 +53,6 @@ class Player(BaseModel):
 
     def reset(self):
         self.rating = 1600
-        self.normalised_rating = 1600
 
 
 class PlayerDatabase(MongoPurePydantic, Player):
