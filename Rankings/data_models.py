@@ -5,13 +5,20 @@ match.py: A set of tools to run a rankings system based on chess rankings
 """
 
 from datetime import datetime, timezone
+from enum import Enum
 
 from bson import ObjectId
 from pydantic import BaseModel, validator
 
 from Rankings.Mongo import MongoPurePydantic
 
-__all__ = ["Match", "MatchDatabase", "PlayerDatabase", "Player"]
+__all__ = ["EResult", "Match", "MatchDatabase", "PlayerDatabase", "Player"]
+
+
+class EResult(Enum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
 
 
 class Match(BaseModel):
