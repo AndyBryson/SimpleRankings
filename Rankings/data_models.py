@@ -7,7 +7,7 @@ match.py: A set of tools to run a rankings system based on chess rankings
 from datetime import datetime, timezone
 
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from .mongo_pure_pydantic import MongoPurePydantic
 
@@ -42,7 +42,7 @@ class MatchDatabase(Match, MongoPurePydantic):
 
 class Player(BaseModel):
     id: str | None = None
-    name: str = ""
+    name: str
     active: bool = True
     rating: float = 1600
     match_count: int = 0
@@ -52,6 +52,12 @@ class Player(BaseModel):
 
     def reset(self):
         self.rating = 1600
+
+    @validator("name")
+    def validate_name(cls, v: str):
+        if not v.strip():
+            raise ValueError("Name cannot be empty")
+        return v
 
 
 class PlayerDatabase(MongoPurePydantic, Player):
