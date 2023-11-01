@@ -4,7 +4,7 @@
 match.py: A set of tools to run a rankings system based on chess rankings
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from bson import ObjectId
 from pydantic import BaseModel
@@ -18,7 +18,7 @@ class Match(BaseModel):
     id: str | None = None
     result: list[str]
     draw: bool
-    date: datetime
+    date: datetime = datetime.now(timezone.utc)
 
 
 class MatchDatabase(Match, MongoPurePydantic):
@@ -42,8 +42,7 @@ class MatchDatabase(Match, MongoPurePydantic):
 
 class Player(BaseModel):
     id: str | None = None
-    first_name: str = ""
-    last_name: str = ""
+    name: str = ""
     active: bool = True
     rating: float = 1600
     match_count: int = 0

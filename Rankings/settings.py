@@ -22,5 +22,7 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8080
 
+    backend_cors_origins: list[str] = ["*"]
+
     mongo_host: str = "localhost"
     mongo_port: int = 27017

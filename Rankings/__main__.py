@@ -18,9 +18,9 @@ def main(host: str, port: int, debug: bool):
     manager = Manager(config=settings)
 
     if debug:
-        alice = manager.add_player(Player(first_name="Alice", last_name="Smith"))
-        bob = manager.add_player(Player(first_name="Bob", last_name="Jones"))
-        charlie = manager.add_player(Player(first_name="Charlie", last_name="Brown"))
+        alice = manager.add_player(Player(name="Alice Smith"))
+        bob = manager.add_player(Player(name="Bob Jones"))
+        charlie = manager.add_player(Player(name="Charlie Brown"))
         charlie_id = str(charlie.id)
         bob_id = str(bob.id)
         alice_id = str(alice.id)
@@ -31,7 +31,7 @@ def main(host: str, port: int, debug: bool):
             Match(result=[bob_id, charlie_id], draw=False, date=datetime.now(tz=timezone.utc) - timedelta(hours=2))
         )
 
-    api = build_api(manager=manager)
+    api = build_api(manager=manager, settings=settings)
 
     uvicorn.run(api, host=host, port=port)
 

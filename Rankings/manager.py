@@ -63,13 +63,13 @@ class Manager:
         self.recalculate_rankings()
         # TODO: Save to database?
 
-    def add_match(self, match: Match) -> Match:
+    def add_match(self, match: Match) -> MatchDatabase:
         db_match = MatchDatabase.from_match(match)
         db_match.id = ObjectId()
         # TODO: Save to database
         self.__matches.append(db_match)
         self._apply_points(db_match)
-        return match
+        return db_match
 
     def _apply_points(self, match: MatchDatabase):
         assert len(match.result) == 2, "We need 2 people in a match"

@@ -1,14 +1,24 @@
 from bson import ObjectId
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from .data_models import Match, Player
 from .manager import Manager
+from .settings import Settings
 
 __all__ = ["build_api"]
 
 
-def build_api(manager: Manager) -> FastAPI:
+def build_api(manager: Manager, settings: Settings) -> FastAPI:
     api = FastAPI()
+    if settings.backend_cors_origins:
+        api.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.backend_cors_origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     @api.get("/players", response_model=list[Player])
     def get_players():
@@ -43,8 +53,8 @@ def build_api(manager: Manager) -> FastAPI:
 
     @api.post("/matches")
     def add_match(match: Match):
-        match = manager.add_match(match)
-        return match
+        db_match = manager.add_match(match)
+        return db_match.to_match()
 
     @api.delete("/matches/{match_id}")
     def delete_match(match_id: str):
