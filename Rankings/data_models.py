@@ -12,7 +12,7 @@ from pydantic import BaseModel, validator
 
 from Rankings.Mongo import MongoPurePydantic
 
-__all__ = ["EResult", "Match", "MatchDatabase", "PlayerDatabase", "Player"]
+__all__ = ["EResult", "MatchAPI", "Match", "Player", "PlayerAPI"]
 
 
 class EResult(Enum):
@@ -21,25 +21,25 @@ class EResult(Enum):
     DRAW = "draw"
 
 
-class Match(BaseModel):
+class MatchAPI(BaseModel):
     id: str | None = None
     result: list[str]
     draw: bool
     date: datetime = datetime.now(timezone.utc)
 
 
-class MatchDatabase(Match, MongoPurePydantic):
+class Match(MatchAPI, MongoPurePydantic):
     __meta__ = {"collection": "matches"}
     result: list[ObjectId]
 
-    def to_match(self) -> Match:
+    def to_api(self) -> MatchAPI:
         d = self.dict()
         d["id"] = str(self.id)
         d["result"] = [str(x) for x in self.result]
-        return Match(**d)
+        return MatchAPI(**d)
 
     @classmethod
-    def from_match(cls, match: Match):
+    def from_api(cls, match: MatchAPI):
         d = match.dict()
         if _id := d.get("id"):
             d["id"] = ObjectId(_id)
@@ -47,7 +47,7 @@ class MatchDatabase(Match, MongoPurePydantic):
         return cls(**d)
 
 
-class Player(BaseModel):
+class PlayerAPI(BaseModel):
     id: str | None = None
     name: str
     active: bool = True
@@ -67,10 +67,10 @@ class Player(BaseModel):
         return v
 
 
-class PlayerDatabase(MongoPurePydantic, Player):
+class Player(MongoPurePydantic, PlayerAPI):
     __meta__ = {"collection": "players"}
 
-    def to_player(self) -> Player:
+    def to_api(self) -> PlayerAPI:
         d = self.dict()
         d["id"] = str(self.id)
-        return Player(**d)
+        return PlayerAPI(**d)

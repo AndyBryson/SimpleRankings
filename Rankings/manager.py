@@ -3,7 +3,7 @@ import copy
 from bson import ObjectId
 
 import Rankings.Mongo.motor as motor
-from .data_models import EResult, Match, MatchDatabase, Player, PlayerDatabase
+from .data_models import EResult, Match, MatchAPI, Player, PlayerAPI
 from .settings import Settings
 
 __all__ = ["Manager"]
@@ -18,13 +18,13 @@ class Manager:
         self._config = config
         self._motor_client = motor.connect(config.mongo)
 
-    async def get_players(self) -> dict[ObjectId, PlayerDatabase]:
-        player_list = await motor.find(PlayerDatabase).to_list(None)
+    async def get_players(self) -> dict[ObjectId, Player]:
+        player_list = await motor.find(Player).to_list(None)
         players = {player.id: player for player in player_list}
         return players
 
-    async def get_matches(self) -> list[MatchDatabase]:
-        matches = await motor.find(MatchDatabase).to_list(None)
+    async def get_matches(self) -> list[Match]:
+        matches = await motor.find(Match).to_list(None)
         return copy.deepcopy(matches)
 
     async def recalculate_rankings(self):
@@ -34,17 +34,17 @@ class Manager:
 
         matches = await self.get_matches()
 
-        await motor.delete_many(MatchDatabase)
+        await motor.delete_many(Match)
 
         for match in matches:
             await self.add_match(match)
 
-    async def add_player(self, player: Player) -> PlayerDatabase:
-        db_player = PlayerDatabase(**player.dict())
+    async def add_player(self, player: PlayerAPI) -> Player:
+        db_player = Player(**player.dict())
         await motor.insert_one(db_player)
         return db_player
 
-    async def update_player(self, player: Player) -> PlayerDatabase:
+    async def update_player(self, player: PlayerAPI) -> Player:
         _id = ObjectId(player.id)
         existing_player = await self.get_player(_id)
 
@@ -55,11 +55,11 @@ class Manager:
         await motor.update_one(existing_player)
         return existing_player
 
-    async def get_player(self, player_id: ObjectId) -> PlayerDatabase:
-        return await motor.get_from_id(PlayerDatabase, id=player_id)
+    async def get_player(self, player_id: ObjectId) -> Player:
+        return await motor.get_from_id(Player, id=player_id)
 
-    async def get_match(self, match_id: ObjectId) -> MatchDatabase:
-        return await motor.get_from_id(MatchDatabase, id=match_id)
+    async def get_match(self, match_id: ObjectId) -> Match:
+        return await motor.get_from_id(Match, id=match_id)
 
     async def set_active(self, player_id: ObjectId, active: bool):
         player = await self.get_player(player_id)
@@ -71,17 +71,17 @@ class Manager:
         await motor.delete_one(match)
         await self.recalculate_rankings()
 
-    async def add_match(self, match: Match) -> MatchDatabase:
-        db_match = MatchDatabase.from_match(match)
+    async def add_match(self, match: MatchAPI) -> Match:
+        db_match = Match.from_api(match)
         await motor.insert_one(db_match)
         await self._apply_points(db_match)
         return db_match
 
-    async def _apply_points(self, match: MatchDatabase):
+    async def _apply_points(self, match: Match):
         assert len(match.result) == 2, "We need 2 people in a match"
 
-        winner = await motor.get_from_id(PlayerDatabase, match.result[0])
-        loser = await motor.get_from_id(PlayerDatabase, match.result[1])
+        winner = await motor.get_from_id(Player, match.result[0])
+        loser = await motor.get_from_id(Player, match.result[1])
 
         expected_result = self.expected_score(winner.rating, loser.rating)
         await self._adjust_player_stats(
@@ -95,7 +95,7 @@ class Manager:
     def expected_score(rating_a: float, rating_b: float) -> float:
         return 1.0 / (1 + 10 ** ((rating_b - rating_a) / 400.0))
 
-    async def _adjust_player_stats(self, player: PlayerDatabase, expected_result: float, result: EResult):
+    async def _adjust_player_stats(self, player: Player, expected_result: float, result: EResult):
         k = max((self._config.initial_k - player.match_count), self._config.standard_k)
         adjustment = k * expected_result
 

@@ -2,7 +2,7 @@ from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .data_models import Match, Player
+from .data_models import MatchAPI, PlayerAPI
 from .manager import Manager
 from .settings import Settings
 
@@ -20,22 +20,22 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
             allow_headers=["*"],
         )
 
-    @api.get("/players", response_model=list[Player])
+    @api.get("/players", response_model=list[PlayerAPI])
     async def get_players():
         player_dict = await manager.get_players()
         players = sorted(player_dict.values(), key=lambda player: player.rating)
-        players = [x.to_player() for x in players]
+        players = [x.to_api() for x in players]
         return players
 
-    @api.post("/players", response_model=Player)
-    async def add_player(player: Player):
+    @api.post("/players", response_model=PlayerAPI)
+    async def add_player(player: PlayerAPI):
         if player.id:
             raise ValueError("Player already exists")
         db_player = await manager.add_player(player=player)
-        return db_player.to_player()
+        return db_player.to_api()
 
-    @api.put("/players", response_model=Player)
-    async def update_player(player: Player):
+    @api.put("/players", response_model=PlayerAPI)
+    async def update_player(player: PlayerAPI):
         if not player.id:
             raise ValueError("This is for updating players")
         player = manager.update_player(player)
@@ -46,16 +46,16 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
         player_id = ObjectId(player_id)
         return manager.get_player(player_id)
 
-    @api.get("/matches", response_model=list[Match])
+    @api.get("/matches", response_model=list[MatchAPI])
     async def get_matches():
         matches = manager.get_matches()
-        ret = [x.to_match() for x in matches]
+        ret = [x.to_api() for x in matches]
         return ret
 
     @api.post("/matches")
-    async def add_match(match: Match):
+    async def add_match(match: MatchAPI):
         db_match = manager.add_match(match)
-        return db_match.to_match()
+        return db_match.to_api()
 
     @api.delete("/matches/{match_id}")
     async def delete_match(match_id: str):
