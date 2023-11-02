@@ -2,7 +2,8 @@ import copy
 
 from bson import ObjectId
 
-import Rankings.Mongo.motor as motor
+import RankingsAPI.Mongo.motor as motor
+
 from .data_models import EResult, Match, MatchAPI, Player, PlayerAPI
 from .settings import Settings
 

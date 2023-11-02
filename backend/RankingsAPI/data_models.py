@@ -10,7 +10,7 @@ from enum import Enum
 from bson import ObjectId
 from pydantic import BaseModel, validator
 
-from Rankings.Mongo import MongoPurePydantic
+from RankingsAPI.Mongo import MongoPurePydantic
 
 __all__ = ["EResult", "MatchAPI", "Match", "Player", "PlayerAPI"]
 

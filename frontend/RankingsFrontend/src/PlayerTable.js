@@ -5,6 +5,7 @@ function PlayerTable({players}) {
         <table className="table table-hover">
             <thead>
             <tr>
+                <th>Rank</th>
                 <th>Name</th>
                 <th>Wins</th>
                 <th>Losses</th>
@@ -12,8 +13,9 @@ function PlayerTable({players}) {
             </tr>
             </thead>
             <tbody>
-            {players.map(player => (
+            {players.map((player, index) => (
                 <tr key={player.id}>
+                    <td>{index + 1}</td>
                     <td>{player.name}</td>
                     <td>{player.wins}</td>
                     <td>{player.losses}</td>

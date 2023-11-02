@@ -4,7 +4,7 @@ from pathlib import Path
 from setuptools import find_packages
 
 try:
-    from Rankings.version import __version__
+    from RankingsAPI.version import __version__
 except ModuleNotFoundError:
     # I think we always end up here unless we have every necessary package installed (which we don't want to do)
     exec(Path("MongoBase/version.py").open().read())

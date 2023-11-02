@@ -3,10 +3,10 @@ from datetime import datetime, timedelta, timezone
 import click
 import uvicorn
 
-from Rankings.api import build_api
-from Rankings.data_models import MatchAPI, PlayerAPI
-from Rankings.manager import Manager
-from Rankings.settings import Settings
+from RankingsAPI.api import build_api
+from RankingsAPI.data_models import MatchAPI, PlayerAPI
+from RankingsAPI.manager import Manager
+from RankingsAPI.settings import Settings
 
 
 @click.command()
