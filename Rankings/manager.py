@@ -97,17 +97,22 @@ class Manager:
 
     async def _adjust_player_stats(self, player: Player, expected_result: float, result: EResult):
         k = max((self._config.initial_k - player.match_count), self._config.standard_k)
-        adjustment = k * expected_result
+        if result == EResult.DRAW:
+            score_change = 0.5 - expected_result
+        else:
+            score_change = 1 - expected_result
+
+        adjustment = k * score_change
 
         match result:
             case EResult.WIN:
-                player.rating += 1 - adjustment
+                player.rating += adjustment
                 player.wins += 1
             case EResult.LOSE:
-                player.rating -= 1 - adjustment
+                player.rating -= adjustment
                 player.losses += 1
             case EResult.DRAW:
-                player.rating += 0.5 - adjustment
+                player.rating += adjustment
                 player.draws += 1
             case _:
                 raise RuntimeError("unknown result")

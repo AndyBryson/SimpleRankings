@@ -21,14 +21,17 @@ class EResult(Enum):
     DRAW = "draw"
 
 
-class MatchAPI(BaseModel):
-    id: str | None = None
+class MatchBase(BaseModel):
     result: list[str]
     draw: bool
     date: datetime = datetime.now(timezone.utc)
 
 
-class Match(MatchAPI, MongoPurePydantic):
+class MatchAPI(MatchBase):
+    id: str | None = None
+
+
+class Match(MatchBase, MongoPurePydantic):
     __meta__ = {"collection": "matches"}
     result: list[ObjectId]
 
@@ -47,8 +50,7 @@ class Match(MatchAPI, MongoPurePydantic):
         return cls(**d)
 
 
-class PlayerAPI(BaseModel):
-    id: str | None = None
+class PlayerBase(BaseModel):
     name: str
     active: bool = True
     rating: float = 1600
@@ -67,7 +69,11 @@ class PlayerAPI(BaseModel):
         return v
 
 
-class Player(MongoPurePydantic, PlayerAPI):
+class PlayerAPI(PlayerBase):
+    id: str | None = None
+
+
+class Player(MongoPurePydantic, PlayerBase):
     __meta__ = {"collection": "players"}
 
     def to_api(self) -> PlayerAPI:

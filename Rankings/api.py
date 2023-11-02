@@ -48,18 +48,18 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
 
     @api.get("/matches", response_model=list[MatchAPI])
     async def get_matches():
-        matches = manager.get_matches()
+        matches = await manager.get_matches()
         ret = [x.to_api() for x in matches]
         return ret
 
     @api.post("/matches")
     async def add_match(match: MatchAPI):
-        db_match = manager.add_match(match)
+        db_match = await manager.add_match(match)
         return db_match.to_api()
 
     @api.delete("/matches/{match_id}")
     async def delete_match(match_id: str):
         match_id = ObjectId(match_id)
-        manager.delete_match(match_id)
+        await manager.delete_match(match_id)
 
     return api
