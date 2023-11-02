@@ -61,6 +61,9 @@ class PlayerBase(BaseModel):
 
     def reset(self):
         self.rating = 1600
+        self.wins = 0
+        self.losses = 0
+        self.draws = 0
 
     @validator("name")
     def validate_name(cls, v: str):

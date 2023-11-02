@@ -4,7 +4,7 @@ from bson import ObjectId
 
 import RankingsAPI.Mongo.motor as motor
 
-from .data_models import EResult, Match, MatchAPI, Player, PlayerAPI
+from .data_models import EResult, Match, MatchAPI, MatchBase, Player, PlayerAPI
 from .settings import Settings
 
 __all__ = ["Manager"]
@@ -32,13 +32,12 @@ class Manager:
         players = await self.get_players()
         for player in players.values():
             player.reset()
+            await motor.update_one(player)
 
         matches = await self.get_matches()
 
-        await motor.delete_many(Match)
-
         for match in matches:
-            await self.add_match(match)
+            await self.add_match(match, insert=False)
 
     async def add_player(self, player: PlayerAPI) -> Player:
         db_player = Player(**player.dict())
@@ -72,13 +71,18 @@ class Manager:
         await motor.delete_one(match)
         await self.recalculate_rankings()
 
-    async def add_match(self, match: MatchAPI) -> Match:
-        db_match = Match.from_api(match)
-        await motor.insert_one(db_match)
+    async def add_match(self, match: MatchAPI | Match, insert: bool = True) -> Match:
+        if isinstance(match, MatchAPI):
+            db_match = Match.from_api(match)
+        else:
+            db_match = match
+        if insert:
+            await motor.insert_one(db_match)
+
         await self._apply_points(db_match)
         return db_match
 
-    async def _apply_points(self, match: Match):
+    async def _apply_points(self, match: MatchBase):
         assert len(match.result) == 2, "We need 2 people in a match"
 
         winner = await motor.get_from_id(Player, match.result[0])

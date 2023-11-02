@@ -1,4 +1,4 @@
-const API_URL = process.env.API_URL || 'http://localhost:8080';
+const API_URL = process.env.REACT_APP_API_URL || 'http://192.168.63.30:8091';
 const PLAYERS_ENDPOINT = `${API_URL}/players`;
 const MATCHES_ENDPOINT = `${API_URL}/matches`;
 

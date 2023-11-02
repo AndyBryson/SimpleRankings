@@ -14,6 +14,10 @@ services:
       context: ./frontend
     restart: unless-stopped
     environment:
-      - API_URL=http://api:8080
+      - REACT_APP_API_URL=http://api:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pool_rankings.rule=Host(`pool.bar.local`)
+      - traefik.http.routers.pool_rankings.entrypoints=web
     ports:
       - "8092:80"
