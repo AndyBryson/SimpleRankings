@@ -6,3 +6,4 @@ uvicorn
 loguru
 motor
 mongomock_motor
+MongoBase
