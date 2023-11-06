@@ -41,6 +41,11 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
         player = manager.update_player(player)
         return player
 
+    @api.delete("/players/{player_id}")
+    async def delete_player(player_id: str):
+        player_id = ObjectId(player_id)
+        await manager.delete_player(player_id)
+
     @api.get("/players/{player_id}")
     async def get_player(player_id: str):
         player_id = ObjectId(player_id)

@@ -39,6 +39,17 @@ class Manager:
         for match in matches:
             await self.add_match(match, insert=False)
 
+    async def delete_player(self, player_id: ObjectId):
+        player = await self.get_player(player_id)
+
+        matches = await self.get_matches()
+        for match in matches:
+            if player.id in match.result:
+                await motor.delete_one(match)
+
+        await motor.delete_one(player)
+        await self.recalculate_rankings()
+
     async def add_player(self, player: PlayerAPI) -> Player:
         db_player = Player(**player.dict())
         await motor.insert_one(db_player)
