@@ -38,8 +38,8 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
     async def update_player(player: PlayerAPI):
         if not player.id:
             raise ValueError("This is for updating players")
-        player = manager.update_player(player)
-        return player
+        player = await manager.update_player(player)
+        return player.to_api()
 
     @api.delete("/players/{player_id}")
     async def delete_player(player_id: str):
@@ -49,7 +49,8 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
     @api.get("/players/{player_id}")
     async def get_player(player_id: str):
         player_id = ObjectId(player_id)
-        return manager.get_player(player_id)
+        player = await manager.get_player(player_id)
+        return player.to_api()
 
     @api.get("/matches", response_model=list[MatchAPI])
     async def get_matches():

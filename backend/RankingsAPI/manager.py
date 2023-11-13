@@ -59,7 +59,7 @@ class Manager:
         _id = ObjectId(player.id)
         existing_player = await self.get_player(_id)
 
-        for key, value in player.dict():
+        for key, value in player.dict().items():
             if key != "id":
                 setattr(existing_player, key, value)
 
