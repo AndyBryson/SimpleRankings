@@ -53,14 +53,14 @@ class Match(MatchBase, MongoPurePydantic):
 class PlayerBase(BaseModel):
     name: str
     active: bool = True
-    rating: float = 1600
+    rating: float = 1000
     match_count: int = 0
     wins: int = 0
     losses: int = 0
     draws: int = 0
 
     def reset(self):
-        self.rating = 1600
+        self.rating = 1000
         self.wins = 0
         self.losses = 0
         self.draws = 0
