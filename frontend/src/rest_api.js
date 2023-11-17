@@ -1,9 +1,10 @@
 const API_URL = process.env.REACT_APP_API_URL || 'http://192.168.63.30:8091';
 const PLAYERS_ENDPOINT = `${API_URL}/players`;
 const MATCHES_ENDPOINT = `${API_URL}/matches`;
+const MATCHES_RESOLVED_ENDPOINT = `${API_URL}/matches/resolved`;
 
 function addMatch(winner_id, loser_id, draw=false) {
-    return fetch(MATCHES_ENDPOINT, {
+    return fetch(MATCHES_ENDPOINT + "/resolved", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -15,6 +16,12 @@ function addMatch(winner_id, loser_id, draw=false) {
     })
         .then((response) => response.json())
         .catch((error) => console.log(error));
+}
+
+function getMatches() {
+    return fetch(MATCHES_RESOLVED_ENDPOINT)
+        .then(response => response.json())
+        .catch(error => { console.log(error); });
 }
 
 function getPlayers() {

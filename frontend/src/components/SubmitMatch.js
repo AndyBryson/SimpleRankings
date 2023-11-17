@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { addMatch } from './rest_api';
+import { addMatch } from '../rest_api';
 
-function SubmitMatch({ players, update_players, matches_endpoint }) {
+function SubmitMatch({ players, update_players }) {
     const [showModal, setShowModal] = useState(false);
     const hiddenSubmitRef = React.createRef();
 
