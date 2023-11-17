@@ -7,7 +7,7 @@ import { addPlayer } from "../rest_api";
 function Home({players, update_players}){
     return (
         <div className="App">
-            <div className="container">
+            {/*<div className="container">*/}
                 <PlayerTable players={players}/>
                 <div className="row">
                     <div className="col">
@@ -16,7 +16,7 @@ function Home({players, update_players}){
                     </div>
 
                 </div>
-            </div>
+            {/*</div>*/}
         </div>
     );
 }

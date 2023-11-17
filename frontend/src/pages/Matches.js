@@ -14,14 +14,14 @@ function Matches({players, update_players, matches, update_matches}) {
 
     return (
         <div className="App">
-            <div className="container">
+            {/*<div className="container">*/}
                 <MatchTable matches={matches}/>
                 <div className="row">
                     <div className="col">
                         <SubmitMatch players={players} update_players={update_players} />
                     </div>
                 </div>
-            </div>
+            {/*</div>*/}
         </div>
     );
 }

@@ -6,8 +6,8 @@ function MatchRow({match}) {
         <tr>
             <td>{match.winner_name} ({Math.round(match.winner_rating)})</td>
             <td>{match.loser_name} ({Math.round(match.loser_rating)})</td>
-            <td>{match.probability.toFixed(2)}</td>
-            <td>{match.date}</td>
+            <td>{Math.round(match.probability * 100)}%</td>
+            <td>{new Date(match.date).toLocaleString("en-GB")}</td>
         </tr>
     );
 }
