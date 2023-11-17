@@ -1,11 +1,11 @@
 import React from "react";
 
-
 function MatchRow({match}) {
+
     return (
         <tr>
-            <td>{match.winner_name} ({Math.round(match.winner_rating)})</td>
-            <td>{match.loser_name} ({Math.round(match.loser_rating)})</td>
+            <td>{match.winner_name} <span className={'text-muted'}>({Math.round(match.winner_rating)})</span></td>
+            <td>{match.loser_name} <span className={'text-muted'}>({Math.round(match.loser_rating)})</span></td>
             <td>{Math.round(match.probability * 100)}%</td>
             <td>{new Date(match.date).toLocaleString("en-GB")}</td>
         </tr>

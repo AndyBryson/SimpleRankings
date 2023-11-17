@@ -14,7 +14,6 @@ function Home({players, update_players}){
                         <SubmitMatch players={players} update_players={update_players} />
                         <button type="button" className="btn btn-primary ms-2" onClick={() => addPlayer({update_players})}>Add Player</button>
                     </div>
-
                 </div>
             {/*</div>*/}
         </div>

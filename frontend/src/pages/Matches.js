@@ -5,12 +5,9 @@ import MatchTable from "../components/MatchTable";
 
 function Matches({players, update_players, matches, update_matches}) {
 
-
     useEffect(() => {
-        if (matches.length < 1) {
-            update_matches();
-        }
-    });
+        update_matches();
+    }, []);
 
     return (
         <div className="App">
