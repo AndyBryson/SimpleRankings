@@ -51,4 +51,4 @@ function addPlayer({update_players}) {
         .catch(error => console.log(error));
 }
 
-export { getPlayers, addPlayer, addMatch };
+export { getPlayers, addPlayer, addMatch, getMatches };
