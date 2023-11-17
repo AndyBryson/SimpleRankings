@@ -28,7 +28,7 @@ const Main = () => {
         <Routes>
             <Route exact path='/' element={<Home players={players} update_players={update_players} />} />
             <Route path='/matches' element={<Matches players={players} update_players={update_players} matches={matches} update_matches={update_matches}/>} />
-            <Route path={'/player/:id'} element={<Profile playerId={1} />} />
+            <Route path={'/player/:id'} element={<Profile />} />
         </Routes>
     );
 };
