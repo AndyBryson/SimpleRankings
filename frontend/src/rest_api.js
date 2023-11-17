@@ -34,6 +34,18 @@ function getPlayers() {
         .catch(error => { console.log(error); });
 }
 
+function getPlayer(playerId) {
+    return fetch(`${API_URL}/players/${playerId}`)
+        .then(response => response.json())
+        .catch(error => { console.log(error); });
+}
+
+function getPlayersMatches(playerId) {
+    return fetch(`${API_URL}/players/${playerId}/matches`)
+        .then(response => response.json())
+        .catch(error => { console.log(error); });
+}
+
 function addPlayer({update_players}) {
     const name = prompt("Enter player name");
     return fetch(PLAYERS_ENDPOINT, {
@@ -51,4 +63,4 @@ function addPlayer({update_players}) {
         .catch(error => console.log(error));
 }
 
-export { getPlayers, addPlayer, addMatch, getMatches };
+export { getPlayers, addPlayer, addMatch, getMatches, getPlayersMatches, getPlayer };

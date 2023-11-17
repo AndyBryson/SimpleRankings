@@ -28,6 +28,10 @@ class Manager:
         matches = await motor.find(Match).to_list(None)
         return copy.deepcopy(matches)
 
+    async def get_matches_by_player(self, player_id: ObjectId) -> list[Match]:
+        matches = await motor.find(Match, {"result": player_id}).to_list(None)
+        return copy.deepcopy(matches)
+
     async def recalculate_rankings(self):
         players = await self.get_players()
         for player in players.values():

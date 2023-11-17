@@ -46,11 +46,23 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
         player_id = ObjectId(player_id)
         await manager.delete_player(player_id)
 
-    @api.get("/players/{player_id}")
+    @api.get("/players/{player_id}", response_model=PlayerAPI)
     async def get_player(player_id: str):
         player_id = ObjectId(player_id)
         player = await manager.get_player(player_id)
         return player.to_api()
+
+    @api.get("/players/{player_id}/matches", response_model=list[MatchAPIReturn])
+    async def get_player_matches(player_id: str):
+        player_id = ObjectId(player_id)
+        matches = await manager.get_matches_by_player(player_id)
+        ret = []
+        for match in matches:
+            d = match.to_api().dict()
+            d["winner_name"] = (await manager.get_player(match.result[0])).name
+            d["loser_name"] = (await manager.get_player(match.result[1])).name
+            ret.append(d)
+        return ret
 
     @api.get("/matches", response_model=list[MatchAPIReturn])
     async def get_matches():
