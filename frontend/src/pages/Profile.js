@@ -7,7 +7,7 @@ import {json, useParams} from "react-router-dom";
 function Profile() {
     const { id } = useParams();
     const [playersMatches, setPlayersMatches] = useState([]);
-    const [player, setPlayer] = useState({});//[name, setName] = useState('');
+    const [player, setPlayer] = useState({});
 
     useEffect(() =>
     {
