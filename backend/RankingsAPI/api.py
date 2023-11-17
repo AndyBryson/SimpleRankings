@@ -52,7 +52,7 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
         player = await manager.get_player(player_id)
         return player.to_api()
 
-    @api.get("/players/{player_id}/matches", response_model=list[MatchAPIReturn])
+    @api.get("/players/{player_id}/matches", response_model=list[MatchAPIReturnResolved])
     async def get_player_matches(player_id: str):
         player_id = ObjectId(player_id)
         matches = await manager.get_matches_by_player(player_id)
