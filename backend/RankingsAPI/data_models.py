@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from enum import Enum
 
 from bson import ObjectId
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
 
 from RankingsAPI.Mongo import MongoPurePydantic
 
@@ -24,7 +24,7 @@ class EResult(Enum):
 class MatchBase(BaseModel):
     result: list[str]
     draw: bool
-    date: datetime = datetime.now(timezone.utc)
+    date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class MatchAPI(MatchBase):
