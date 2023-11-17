@@ -2,19 +2,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 
 import Main from './Main';
-import {Link} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 
 const Navbar = () => {
       return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
-      <Link className="navbar-brand" to="/">
-        BAR Tech Pool
-      </Link>
+      <NavLink className="navbar-brand" to="/">
+        Pool
+      </NavLink>
       <button
         className="navbar-toggler"
         type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
         aria-controls="navbarNav"
         aria-expanded="false"
         aria-label="Toggle navigation"
@@ -24,14 +24,14 @@ const Navbar = () => {
       <div className="collapse navbar-collapse" id="navbarNav">
         <ul className="navbar-nav">
           <li className="nav-item">
-            <Link className="nav-link" to="/">
+            <NavLink className="nav-link" to="/">
               Rankings
-            </Link>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/matches">
+            <NavLink className="nav-link" to="/matches">
               Matches
-            </Link>
+            </NavLink>
           </li>
         </ul>
       </div>
