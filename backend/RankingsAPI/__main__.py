@@ -4,7 +4,7 @@ import click
 import uvicorn
 
 from RankingsAPI.api import build_api
-from RankingsAPI.data_models import MatchAPI, PlayerAPI
+from RankingsAPI.data_models import MatchAPISubmit, PlayerAPI
 from RankingsAPI.manager import Manager
 from RankingsAPI.settings import Settings
 
@@ -25,10 +25,14 @@ def main(host: str, port: int, debug: bool):
         bob_id = str(bob.id)
         alice_id = str(alice.id)
         manager.add_match(
-            MatchAPI(result=[alice_id, bob_id], draw=False, date=datetime.now(tz=timezone.utc) - timedelta(hours=1))
+            MatchAPISubmit(
+                result=[alice_id, bob_id], draw=False, date=datetime.now(tz=timezone.utc) - timedelta(hours=1)
+            )
         )
         manager.add_match(
-            MatchAPI(result=[bob_id, charlie_id], draw=False, date=datetime.now(tz=timezone.utc) - timedelta(hours=2))
+            MatchAPISubmit(
+                result=[bob_id, charlie_id], draw=False, date=datetime.now(tz=timezone.utc) - timedelta(hours=2)
+            )
         )
 
     api = build_api(manager=manager, settings=settings)

@@ -2,7 +2,7 @@ from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .data_models import MatchAPI, PlayerAPI
+from .data_models import MatchAPIReturn, MatchAPIReturnResolved, MatchAPISubmit, PlayerAPI
 from .manager import Manager
 from .settings import Settings
 
@@ -52,16 +52,27 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
         player = await manager.get_player(player_id)
         return player.to_api()
 
-    @api.get("/matches", response_model=list[MatchAPI])
+    @api.get("/matches", response_model=list[MatchAPIReturn])
     async def get_matches():
         matches = await manager.get_matches()
         ret = [x.to_api() for x in matches]
         return ret
 
-    @api.post("/matches")
-    async def add_match(match: MatchAPI):
+    @api.post("/matches", response_model=MatchAPIReturn)
+    async def add_match(match: MatchAPISubmit) -> MatchAPIReturn:
         db_match = await manager.add_match(match)
         return db_match.to_api()
+
+    @api.get("/matches/resolved", response_model=list[MatchAPIReturnResolved])
+    async def get_matches_resolved():
+        matches = await manager.get_matches()
+        ret = []
+        for match in matches:
+            d = match.to_api().dict()
+            d["winner_name"] = (await manager.get_player(match.result[0])).name
+            d["loser_name"] = (await manager.get_player(match.result[1])).name
+            ret.append(d)
+        return ret
 
     @api.delete("/matches/{match_id}")
     async def delete_match(match_id: str):

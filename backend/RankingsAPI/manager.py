@@ -4,7 +4,7 @@ from bson import ObjectId
 
 import RankingsAPI.Mongo.motor as motor
 
-from .data_models import EResult, Match, MatchAPI, MatchBase, Player, PlayerAPI
+from .data_models import EResult, Match, MatchAPISubmit, Player, PlayerAPI
 from .settings import Settings
 
 __all__ = ["Manager"]
@@ -82,24 +82,32 @@ class Manager:
         await motor.delete_one(match)
         await self.recalculate_rankings()
 
-    async def add_match(self, match: MatchAPI | Match, insert: bool = True) -> Match:
-        if isinstance(match, MatchAPI):
+    async def add_match(self, match: MatchAPISubmit | Match, insert: bool = True) -> Match:
+        if isinstance(match, MatchAPISubmit):
             db_match = Match.from_api(match)
         else:
             db_match = match
-        if insert:
-            await motor.insert_one(db_match)
 
         await self._apply_points(db_match)
+
+        if insert:
+            await motor.insert_one(db_match)
+        else:
+            await motor.update_one(db_match)
+
         return db_match
 
-    async def _apply_points(self, match: MatchBase):
+    async def _apply_points(self, match: Match):
         assert len(match.result) == 2, "We need 2 people in a match"
 
         winner = await motor.get_from_id(Player, match.result[0])
         loser = await motor.get_from_id(Player, match.result[1])
-
         expected_result = self.expected_score(winner.rating, loser.rating)
+
+        match.winner_rating = winner.rating
+        match.loser_rating = loser.rating
+        match.probability = expected_result
+
         await self._adjust_player_stats(
             winner, expected_result=expected_result, result=EResult.DRAW if match.draw else EResult.WIN
         )

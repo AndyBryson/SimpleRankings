@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field, validator
 
 from RankingsAPI.Mongo import MongoPurePydantic
 
-__all__ = ["EResult", "MatchAPI", "Match", "Player", "PlayerAPI"]
+__all__ = ["EResult", "MatchAPISubmit", "Match", "MatchAPIReturn", "MatchAPIReturnResolved", "Player", "PlayerAPI"]
 
 
 class EResult(Enum):
@@ -27,22 +27,37 @@ class MatchBase(BaseModel):
     date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
-class MatchAPI(MatchBase):
-    id: str | None = None
+class MatchAPISubmit(MatchBase):
+    pass
+
+
+class MatchAPIReturn(MatchBase):
+    id: str = None
+    winner_rating: float | None = None
+    loser_rating: float | None = None
+    probability: float | None = None
+
+
+class MatchAPIReturnResolved(MatchAPIReturn):
+    winner_name: str
+    loser_name: str
 
 
 class Match(MatchBase, MongoPurePydantic):
     __meta__ = {"collection": "matches"}
     result: list[ObjectId]
+    winner_rating: float | None = None
+    loser_rating: float | None = None
+    probability: float | None = None
 
-    def to_api(self) -> MatchAPI:
+    def to_api(self) -> MatchAPIReturn:
         d = self.dict()
         d["id"] = str(self.id)
         d["result"] = [str(x) for x in self.result]
-        return MatchAPI(**d)
+        return MatchAPIReturn(**d)
 
     @classmethod
-    def from_api(cls, match: MatchAPI):
+    def from_api(cls, match: MatchAPISubmit):
         d = match.dict()
         if _id := d.get("id"):
             d["id"] = ObjectId(_id)
