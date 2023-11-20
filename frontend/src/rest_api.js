@@ -4,7 +4,7 @@ const MATCHES_ENDPOINT = `${API_URL}/matches`;
 const MATCHES_RESOLVED_ENDPOINT = `${API_URL}/matches/resolved`;
 
 function addMatch(winner_id, loser_id, draw=false) {
-    return fetch(MATCHES_ENDPOINT + "/resolved", {
+    return fetch(MATCHES_ENDPOINT, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
