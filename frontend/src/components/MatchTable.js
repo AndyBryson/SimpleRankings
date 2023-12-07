@@ -13,6 +13,8 @@ function MatchRow({match}) {
 }
 
 function MatchTable({matches}) {
+    const matches_copy = [...matches];
+    matches_copy.sort((a, b) => { return new Date(b.date) - new Date(a.date) });
     return (
         <table className="table table-hover">
             <thead>
@@ -24,7 +26,7 @@ function MatchTable({matches}) {
             </tr>
             </thead>
             <tbody>
-            {matches.map(match => (
+            {matches_copy.map(match => (
                 <MatchRow key={match.id} match={match} />
             ))}
             </tbody>
