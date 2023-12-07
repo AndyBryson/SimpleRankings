@@ -16,7 +16,9 @@ const Main = () => {
     }
 
     function update_matches() {
-        return getMatches().then(matches => setMatches(matches));
+        return getMatches().then(matches => {
+            setMatches(matches)
+        });
     }
 
     useEffect(() => {
