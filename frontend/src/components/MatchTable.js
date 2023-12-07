@@ -13,6 +13,7 @@ function MatchRow({match}) {
 }
 
 function MatchTable({matches}) {
+    matches.sort((a, b) => (a.date < b.date) ? 1 : -1);
     return (
         <table className="table table-hover">
             <thead>

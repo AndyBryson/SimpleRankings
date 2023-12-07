@@ -31,7 +31,6 @@ function Profile() {
                 <p>Games played: {player.wins + player.losses + player.draws}</p>
                 <p>Wins: {player.wins}</p>
                 <p>Losses: {player.losses}</p>
-                <p>Draws: {player.draws}</p>
             </div>
             <MatchTable matches={playersMatches}/>
         </div>
