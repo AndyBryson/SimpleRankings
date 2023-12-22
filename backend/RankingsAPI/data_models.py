@@ -73,6 +73,7 @@ class PlayerBase(BaseModel):
     wins: int = 0
     losses: int = 0
     draws: int = 0
+    last_match_date: datetime | None = None
 
     def reset(self):
         self.rating = 1000

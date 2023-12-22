@@ -1,8 +1,7 @@
 import React from "react";
-import {useFetcher, Navigate} from "react-router-dom";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-function PlayerRow({player, index}) {
+function PlayerRow({ player, index }) {
     const navigate = useNavigate();
 
     function handleRowClick() {
@@ -10,7 +9,7 @@ function PlayerRow({player, index}) {
     }
 
     return (
-        <tr onClick={handleRowClick} style={{cursor: 'pointer'}}>
+        <tr onClick={handleRowClick} style={{ cursor: 'pointer' }}>
             <td>{index}</td>
             <td>{player.name}</td>
             <td>{player.wins}</td>
@@ -20,27 +19,39 @@ function PlayerRow({player, index}) {
     );
 }
 
-function PlayerTable({players}) {
+function PlayerTable({ players }) {
+    const one_day = 60 * 24 * 60 * 60 * 1000;
+    const inactiveCutoff = Date.now() - one_day * 60;
+    const matchCutoff = 2;
+
+    const activePlayers = players.filter(player => player.wins + player.losses >= matchCutoff && Date.parse(player.last_match_date) > inactiveCutoff).sort((a, b) => (a.rating < b.rating) ? 1 : -1);
+    const inactivePlayers = players.filter(player => player.wins + player.losses >= matchCutoff && Date.parse(player.last_match_date) <= inactiveCutoff).sort((a, b) => (a.rating < b.rating) ? 1 : -1);
+    const newPlayers = players.filter(player => player.wins + player.losses < matchCutoff).sort((a, b) => (a.rating < b.rating) ? 1 : -1);
+
     return (
         <table className="table table-hover">
             <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Wins</th>
-                <th>Losses</th>
-                <th>Rating</th>
-            </tr>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Rating</th>
+                </tr>
             </thead>
             <tbody>
-            {/*Split players into 2 arrays. One for player who have played, one for those who haven't*/}
-            {players.filter(player => player.wins + player.losses > 0).sort((a, b) => (a.rating < b.rating) ? 1 : -1).map((player, index) => (
-                <PlayerRow key={player.id} player={player} index={index+1} />
-            ))}
-            {/*Fill in the rest of the table with players who haven't played*/}
-            {players.filter(player => player.wins + player.losses === 0).sort((a, b) => (a.name > b.name) ? 1 : -1).map(player => (
-                <PlayerRow key={player.id} player={player} index={'-'}/>
-            ))}
+                {/*Show active players first*/}
+                {activePlayers.map((player, index) => (
+                    <PlayerRow key={player.id} player={player} index={index + 1} />
+                ))}
+                {/*Show inactive players next*/}
+                {inactivePlayers.map((player, index) => (
+                    <PlayerRow key={player.id} player={player} index={index + 1} />
+                ))}
+                {/*Fill in the rest of the table with players who haven't played enough*/}
+                {newPlayers.map((player, index) => (
+                    <PlayerRow key={player.id} player={player} index={'-'} />
+                ))}
             </tbody>
         </table>
     );

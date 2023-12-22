@@ -43,6 +43,18 @@ class Manager:
         for match in matches:
             await self.add_match(match, insert=False)
 
+    async def recalculate_last_matches(self):
+        players = await self.get_players()
+        matches = await self.get_matches()
+
+        for player in players.values():
+            player.last_match_date = None
+            for match in matches:
+                if player.id in match.result:
+                    if player.last_match_date is None or match.date > player.last_match_date:
+                        player.last_match_date = match.date
+            await motor.update_one(player)
+
     async def delete_player(self, player_id: ObjectId):
         player = await self.get_player(player_id)
 
@@ -106,6 +118,11 @@ class Manager:
 
         winner = await motor.get_from_id(Player, match.result[0])
         loser = await motor.get_from_id(Player, match.result[1])
+
+        # these changes are saved when we call _adjust_player_stats
+        winner.last_match_date = match.date
+        loser.last_match_date = match.date
+
         expected_result = self.expected_score(winner.rating, loser.rating)
 
         match.winner_rating = winner.rating

@@ -91,4 +91,8 @@ def build_api(manager: Manager, settings: Settings) -> FastAPI:
         match_id = ObjectId(match_id)
         await manager.delete_match(match_id)
 
+    @api.post("/matches/recalculate_last")
+    async def recalculate_last():
+        await manager.recalculate_last_matches()
+
     return api
