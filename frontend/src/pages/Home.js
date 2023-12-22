@@ -3,11 +3,10 @@ import React from 'react';
 import SubmitMatch from "../components/SubmitMatch";
 import PlayerTable from "../components/PlayerTable";
 import { addPlayer } from "../rest_api";
-import SnowFall from 'react-snowfall';
+
 function Home({players, update_players}){
     return (
         <div className="App">
-            <SnowFall />
             {/*<div className="container">*/}
                 <PlayerTable players={players}/>
                 <div className="row">

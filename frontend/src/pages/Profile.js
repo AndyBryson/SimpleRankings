@@ -4,7 +4,6 @@ import MatchTable from "../components/MatchTable";
 import {getPlayersMatches, getPlayer} from "../rest_api";
 import {json, useParams} from "react-router-dom";
 import Plot from "react-plotly.js";
-import SnowFall from "react-snowfall";
 
 
 function RatingMap(matches) {
@@ -62,7 +61,6 @@ function Profile() {
 
     return (
         <div className="App">
-            <SnowFall />
             <div style={{
                 paddingTop: '20px',
             }}>
