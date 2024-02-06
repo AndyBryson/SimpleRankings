@@ -20,7 +20,7 @@ function PlayerRow({ player, index }) {
 }
 
 function PlayerTable({ players }) {
-    const one_day = 60 * 24 * 60 * 60 * 1000;
+    const one_day = 24 * 60 * 60 * 1000;
     const inactiveCutoff = Date.now() - one_day * 60;
     const matchCutoff = 2;
 
@@ -46,7 +46,7 @@ function PlayerTable({ players }) {
                 ))}
                 {/*Show inactive players next*/}
                 {inactivePlayers.map((player, index) => (
-                    <PlayerRow key={player.id} player={player} index={index + 1} />
+                    <PlayerRow key={player.id} player={player} index={'-'} />
                 ))}
                 {/*Fill in the rest of the table with players who haven't played enough*/}
                 {newPlayers.map((player, index) => (
