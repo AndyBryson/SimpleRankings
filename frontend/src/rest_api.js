@@ -3,7 +3,7 @@ const PLAYERS_ENDPOINT = `${API_URL}/players`;
 const MATCHES_ENDPOINT = `${API_URL}/matches`;
 const MATCHES_RESOLVED_ENDPOINT = `${API_URL}/matches/resolved`;
 
-function addMatch(winner_id, loser_id, draw=false) {
+function addMatch(winner_id, loser_id, draw = false) {
     return fetch(MATCHES_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -46,7 +46,7 @@ function getPlayersMatches(playerId) {
         .catch(error => { console.log(error); });
 }
 
-function addPlayer({update_players}) {
+function addPlayer({ update_players }) {
     const name = prompt("Enter player name");
     return fetch(PLAYERS_ENDPOINT, {
         method: 'POST',
@@ -63,4 +63,12 @@ function addPlayer({update_players}) {
         .catch(error => console.log(error));
 }
 
-export { getPlayers, addPlayer, addMatch, getMatches, getPlayersMatches, getPlayer };
+function deleteMatch(id) {
+    return fetch(`${MATCHES_ENDPOINT}/${id}`, {
+        method: 'DELETE',
+    })
+        .then(response => response.json())
+        .catch(error => console.log(error));
+}
+
+export { getPlayers, addPlayer, addMatch, getMatches, getPlayersMatches, getPlayer, deleteMatch };
